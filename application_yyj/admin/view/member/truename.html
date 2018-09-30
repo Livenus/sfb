@@ -1,0 +1,444 @@
+<{include file="public/header" }>
+<script type="text/javascript" charset="utf-8" src="/static/js/plugins/bootstrap-table/bootstrap-table.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="/static/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js"></script>
+<link rel="stylesheet" href="/static/css/plugins/bootstraptable/bootstrap-table.min.css">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="ibox float-e-margins">
+        <div class="ibox-title" style=" padding-bottom: 0;">
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="javascript:;">实名认证列表</a></li>
+            </ul>
+        </div>
+        <div class="ibox-content">
+            <div class="row row-lg">
+                <div class="col-sm-12">
+                    <!-- Example Events -->
+                    <div class="example-wrap">
+                        <div class="example">
+                            <div class="hidden-xs" id="exampleTableEventsToolbar" role="group">
+                                    <button type="button" class="btn btn-sm btn-primary" id="btnyes" data-status="1">
+                                        <i class="glyphicon glyphicon-plus" aria-hidden="true" ></i> 审核通过
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-white" id="btnno" data-status="3">
+                                        <i class="glyphicon glyphicon-trash" aria-hidden="true"></i> 拒绝
+                                    </button>
+                            </div>
+                            <!---search start-->
+                            <div class="right">
+                                 <input name="banknum" type="hidden" value="1">
+                                <span style=" line-height: 30px; margin-right: 5px;">会员名:</span>
+                                <input type="text" id="name" value="" class="input_zdy input-sm" size=15 placeholder="" name="uname" />
+                                <span style=" line-height: 30px; margin-right: 5px;">手机号:</span>
+                                <input type="text" id="phone" value="" class="input_zdy input-sm" size=15 placeholder="" name="phone" />
+                                <span style=" line-height: 30px; margin-right: 5px;">真实姓名:</span>
+                                <input type="text" id="realname" value="" class="input_zdy input-sm" size=15 placeholder="" name="realname"/>
+                                <span style=" line-height: 30px; margin-right: 5px;">状态:</span>
+                                <select id="stat" class="input_zdy input-sm" name="stat">
+                                    <option value="-1">全部</option>
+                                    <option value="1" >通过</option>
+                                    <option value="2" selected="selected">待审核</option>
+                                    <option value="3">拒绝</option>
+                                </select>
+                                <a href="javascript:;" id="btnsearch" class="btn btn-primary btn-sm">查询</a>
+                            </div>
+                            <!---search end---->
+                            <table id="dg" data-height="100%" data-mobile-responsive="true">
+                            </table>
+                        </div>
+                    </div>
+                    <!-- End Example Events -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var update_url="<{:url('Member/update_status')}>";
+    var update_del="<{:url('Member/del_truename')}>";
+    var update_edit="<{:url('Member/edit')}>";
+    function getQueryParams() {
+    var q = {};
+    q.uname = $("#name").val();
+    q.realname = $("#realname").val();
+    q.is_rz_1 = $("#stat").val();
+    q.phone = $("#phone").val();
+     q.banknum = $("[name='banknum']").val();
+    return q;
+    }
+    $("#btnsearch").click(function() {
+    q = getQueryParams();
+    console.log(q);
+    $("#dg").bootstrapTable('refresh', { url: "<{:url('member/listajax')}>", query: q });
+    })
+            $("#btnadd").click(function() {
+    location.href = "<{:url('member/add')}>";
+    })
+
+
+            $("#btndel").click(function() {
+    var items = $("#dg").bootstrapTable('getSelections');
+    items = objcolum(items, 'id');
+    if (items.length <= 0) {
+    swal("出错了", "请选择要删除的值", "error");
+    } else {
+    del(items);
+    }
+    });
+    function del(ids) {
+    swal({
+    title: "您确定要删除吗",
+            text: "删除后将无法恢复，请谨慎操作！",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            closeOnConfirm: false,
+            closeOnCancel: false
+    },
+            function(isConfirm) {
+            var cur = 0;
+            if (isConfirm) {
+            if (!$.isArray(ids)) {
+            ids = [ids];
+            }
+            $.ajax({
+            url: "<{:url('member/del')}>",
+                    data: { id: ids },
+                    type: 'post',
+                    dataType: 'json',
+                    success: function(d) {
+
+
+                    init(cur, ids.length, d);
+                    }
+            });
+            //swal("删除成功！", "您已经永久删除了这条信息。", "success");
+            } else {
+            swal("已取消", "您取消了删除操作！", "error");
+            }
+            });
+    }
+
+    function init(cur, i, d) {
+
+
+    var percent = parseInt(cur * 100 / i);
+    var content = '<div class="pull-left"><p id="p_text"><span id="p_text1">' + cur + '</span>/' + i + '</p></div>' +
+            '<div class="progress">' +
+            '   <div class="progress-bar" role="progressbar progress-bar-striped active" aria-valuenow="' + percent + '" aria-valuemin="0" aria-valuemax="100" style="width: ' + percent + '%;min-width: 2em;">' + percent + '%</div>' +
+            '</div>';
+    layer.open({type:1, title:'系统提示', content:content, area:['600px', '460px'],
+            success:function(){
+            var schedule = setInterval(function(){
+            cur++;
+            $("#p_text1").html(cur);
+            percent = parseInt(cur * 100 / i);
+            $('.progress').html('<div class="progress-bar" role="progressbar progress-bar-striped active" aria-valuenow="' + percent + '" aria-valuemin="0" aria-valuemax="100" style="width: ' + percent + '%;min-width: 2em;">' + percent + '%</div>')
+                    if (cur >= i){
+            clearInterval(schedule);
+            setTimeout(function(){
+            if (d.stat == '1') {
+            swal({
+            title: "太帅了",
+                    text: d.msg,
+                    type: "success"
+            }, function() {
+            location.href = "<{:url('member/index')}>";
+            });
+            } else {
+            swal({
+            title: "出错了",
+                    text: d.msg,
+                    type: "error"
+            });
+            }
+            }, 500)
+
+            }
+            }, 500)
+            }});
+    }
+
+    function changeData(t) {
+    var $form = $("#change_member_data");
+    $.ajax({
+    url: $form.attr('action'),
+            data: $form.serialize(),
+            method: 'post',
+            dataType: 'json',
+            success: function(d) {
+            if (d.stat == '1') {
+            jf.closedialog(dialog1);
+            location.href = " <{:url('member/list')}>";
+            } else {
+            alert(d.msg ? d.msg : '操作失败');
+            return;
+            }
+            },
+            error: function(d) {
+            alert(d.msg ? d.msg : '操作失败');
+            return;
+            }
+    });
+    }
+
+    function showchange(id, oldData, act) {
+    var title = '';
+    if (act == 'points') {
+    title = '积分';
+    } else if (act == 'exp_points') {
+    title = '经验';
+    }
+    if (title == '' || !id) {
+    alert('参数错误');
+    return;
+    }
+    var content = '<form action="<{:url('
+            member / changeData ')}>" class="form-horizontal form" data-jf="jf_1" id="change_member_data" method="post" onsubmit="return false">' +
+            ' <input name="id" type="hidden" value="' + id + '">' +
+            ' <input name="act" type="hidden" value="' + act + '">' +
+            ' <div class="form-group">' +
+            '  <label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">会员' + title + '值</label>' +
+            '  <div class="col-sm-7 col-lg-8 col-xs-12">' + oldData +
+            '   </div>' +
+            ' </div>' +
+            ' <div class="form-group">' +
+            '  <label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">' + title + '</label>' +
+            '  <div class="col-sm-7 col-lg-8 col-xs-12">' +
+            '   <input class="form-control" name="data" type="text" value=""><span class="help-block">"+"或是纯数字表示增，"-"表示减</span>' +
+            '   </div>' +
+            ' </div>' +
+            ' <div class="form-group">' +
+            '  <label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">描述</label>' +
+            '  <div class="col-sm-7 col-lg-8 col-xs-12">' +
+            '  <textarea class="form-control" name="desc"></textarea><span class="help-block">描述信息将显示在' + title + '明细相关页，会员和管理员都可见</span>' +
+            '   </div>' +
+            ' </div>' +
+            '</form>';
+    var footer = '<button class="btn btn-primary" onclick="changeData(this)">确认</button>',
+            options = { area: ['600px', '85%'], };
+    dialog1 = jf.dialog('修改' + title, content + footer, options);
+    }
+    $(function() {
+    $('#dg').bootstrapTable({
+    url: "<{:url('member/listajax')}>"+"?banknum=1",
+            //method:'post',
+            queryParams: function(params) {
+            params.p = parseInt(params.offset / params.limit) + 1;
+            params = $.extend(params, getQueryParams());
+            return params;
+            },
+            queryParamsType: "limit",
+            contentType: 'application/json',
+            dataType: 'json',
+            sidePagination: "server", //表示服务端请求
+            pagination: true, //启动分页
+            pageNumber: 1, //当前第几页
+            pageSize: 5, //每页显示的记录数
+            pageList: [10, 15, 20], //记录数可选列表
+            dataField: 'rows',
+            idField: "id",
+            columns: [{ checkbox: true, align: 'center', valign: 'middle' },
+            { title: '会员ID', field: 'id', align: 'center', valign: 'middle' },
+            { title: '会员名', field: 'uname', align: 'center', valign: 'middle' },
+            { title: '手机号', field: 'phone', align: 'center', valign: 'middle' },
+            { title: '真实姓名', field: 'truename', align: 'center', valign: 'middle' },
+            { title: '身份证号', field: 'idnum', align: 'center', valign: 'middle' },
+            { title: '持卡银行', field: 'bankname', align: 'center', valign: 'middle' },
+            { title: '银行卡号', field: 'banknum', align: 'center', valign: 'middle' },
+            { title: '地区', field: 'area', align: 'center', valign: 'middle',
+             formatter: function(value, row, index) {
+                 
+                 
+                 return row.bank_area.province+row.bank_area.city+row.bank_area.county;
+             }
+        
+        },
+            { title: '开户行', field: 'bank_area.detail', align: 'center', valign: 'middle' },
+            { title: '预留手机号', field: 'bank_phone', align: 'center', valign: 'middle' },  
+            {
+            title: '实名认证',
+                    field: 'stat',
+                    align: 'center',
+                    valign: 'middle',
+                    formatter: function(value, row, index) {
+                    var html = '';
+                    if (row.is_rz_1 == '1') {
+                    html = '<span class=" " ids="'+row.id +'">通过</span>';
+                    } else if(row.is_rz_1 == '2'){
+                   html = '<span class=" " ids="'+row.id +'">待审核</span>';
+                    }else if(row.is_rz_1 == '3'){
+                   html = '<span class=" " ids="'+row.id +'">已拒绝</span>';
+                    }else {
+                   html = '<span class=" " ids="'+row.id +'">未提交</span>';
+                    }
+                    return html;
+                    }
+            },
+            {
+            title: '操作',
+                    field: 'n_do',
+                    align: 'center',
+                    valign: 'middle',
+                    formatter: function(value, row, index) {
+                    var html = '';
+                    html = '<a href="" data-id='+ row.id+' class="btn btn-warning btn-sm detail" data-toggle="tooltip" data-placement="top" title="编辑" style=" margin-right:4px;"><span class="glyphicon glyphicon-edit"></span> 查看</a>\n\
+            \n\<a href="" data-status=1 data-id='+ row.id+' class="btn btn-warning btn-sm action_yes" data-toggle="tooltip" data-placement="top" title="通过" style=" margin-right:4px;"><span class="glyphicon glyphicon-edit"></span> 通过</a>\n\
+\n\<a href="" data-status=3 data-id='+ row.id+' class="btn btn-danger btn-sm action_no" data-toggle="tooltip" data-placement="top" title="拒绝" style=" margin-right:4px;"><span class="glyphicon glyphicon-edit"></span> 拒绝</a>\n\
+\n\<a href="" data-status=6 data-id='+ row.id+' class="btn btn-danger btn-sm action_no" data-toggle="tooltip" data-placement="top" title="删除" style=" margin-right:4px;"><span class="glyphicon glyphicon-edit"></span> 删除</a>\n\
+<ul class="dropdown-menu" role="menu" aria-labelledby="menu1"></ul></div>';
+                    return html;
+                    }
+            }
+            ],
+            responseHandler: function(res) {
+            //远程数据加载之前,处理程序响应数据格式,对象包含的参数: 我们可以对返回的数据格式进行处理
+            //在ajax后我们可以在这里进行一些事件的处理
+            return res;
+            },
+            search: false,
+            iconSize: 'outline',
+            toolbar: '#exampleTableEventsToolbar',
+            icons: {
+            refresh: 'glyphicon-repeat',
+                    toggle: 'glyphicon-list-alt',
+                    columns: 'glyphicon-list'
+            },
+            toolbarAlign: 'left',
+            showToggle: false,
+            showColumns: false, //显示下拉框勾选要显示的列
+            minimumCountColumns: 3,
+            showRefresh: true, //显示刷新按钮
+            striped: true, //表格显示条纹
+            singleSelect: false, //复选框只能选择一条记录  
+            clickToSelect: false, //点击行即可选中单选/复选框  
+            checkboxHeader: true
+    });
+function alert_m(msg){
+                            swal("提示信息", msg, "success");   
+}
+   function update_post(url,data,msg){
+       $.post(url,data,function(data){
+           
+           if(data.stat==1){
+               msg();
+           }else{
+               alert(data.msg);
+           }
+       })
+   } 
+   function confirm_dialog(title,dec,action){
+ swal({
+        title: title,
+        text: dec,
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        cancelButtonText:"取消",
+        confirmButtonText: "确认",
+         closeOnConfirm: false,
+         html: true 
+    }, function (isConfirm) {
+        if(isConfirm){
+        action();    
+        }
+    });
+       
+   }
+    $("body").on("click",".action_yes,.action_no",function(e){
+        e.preventDefault();
+        var status=$(this).attr("data-status");
+
+         var id=$(this).attr("data-id");
+       var data={id:id,status:status};
+       var url=update_url;
+         var msgs="用户审核已通过";
+         if(status==1){
+             var msg="确认通过此用户实名状态";
+         }else if(status==6){
+             var msg="确认删除用户实名信息";
+             var msgs="用户身份认证已删除";
+         }else{
+             var msg="拒绝此用户实名";
+             var msgs="用户审核已拒绝";
+         };
+         var content="<br/><textarea name='content' placeholder='输入原因' rows='3' cols='30'></textarea>";
+confirm_dialog("确认提示:"+msg,content,function(){
+            if($("[name='content']").val()==""&&status==3){
+                alert("原因必填");
+                return false;
+            }else{
+                data.is_rz_1_content=$("[name='content']").val();
+            }
+        if(id){
+            
+            update_post(url,data,function(){
+                        swal("操作成功！", msgs, "success");   
+                        $("[name='refresh']").click();
+            });
+        }
+
+    
+});
+    })
+    $("body").on("click","#btnyes,#btnno",function(e){
+        e.preventDefault();
+    var items = $("#dg").bootstrapTable('getSelections');
+    items = objcolum(items, 'id');
+ if(items.length==0){
+     alert_m("未选中任何数据");
+     return false;
+ }
+        var status=$(this).attr("data-status");
+    console.log(items);
+
+       var data={id:items,status:status};
+       var url=update_url;
+         if(status==1){
+             var msg="确认通过次用户实名状态";
+             var msgs="用户审核已通过";
+         }else{
+             var msg="拒绝此用户实名";   
+             var msgs="用户审核已拒绝";
+         };
+
+confirm_dialog("确认提示",msg,function(){
+
+        if(items){
+            
+            update_post(url,data,function(){
+                        swal("操作成功！", "用户审核已通过", "success");   
+                        $("[name='refresh']").click();
+            });
+        }
+
+    
+});
+    })
+    $("body").on("click",".action_del",function(e){
+        e.preventDefault();
+         var id=$(this).attr("data-id");
+       var data={id:id};
+            var msg="删除此用户认证信息";  
+confirm_dialog("确认提示",msg,function(){
+
+        if(id){
+            update_post(update_del,status,function(){
+                        swal("操作成功！", "删除成功", "success");   
+                        $("[name='refresh']").click();
+            });
+        }
+
+    
+});
+    })
+    $("body").on("click",".detail",function(e){
+        e.preventDefault();
+                 var id=$(this).attr("data-id");
+        location.href=update_edit+"?uid="+id+"&disable=1";
+    })
+    });
+   
+</script>
+<{include file="public/footer" }>

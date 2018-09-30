@@ -1,0 +1,84 @@
+<{include file="public/header"}>
+<link type="text/css" rel="stylesheet" href="/static/css/plugins/iCheck/custom.css">
+<script type="text/javascript" charset="utf-8" src="/static/js/plugins/iCheck/icheck.min.js"></script>
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="tabs-container ibox-title">
+					<ul class="nav nav-tabs">
+						<li><a class="icon iconfont icon-favor_light" href="<{:url('area/index')}>" class="jf_sub_menu">地区列表</a></li>
+						<li class="active"><a href="javascript:;">修改地区</a></li>
+					</ul>
+                    <div class="ibox-content">
+                    	<div class="">
+	                    <form class="form-horizontal" id="form1" onclick="return false">
+    						<div class="">
+								<input type="hidden" value="<{$info.a_id}>" name="a_id">
+    							<div class="form-group ">
+                                    <div class="col-sm-2 control-label">地区名称</div>
+                                    <div class="col-sm-4">
+                                        <input id="formitem_1" type="text" class="form-control" value="<{$info.a_name}>" name="a_name">
+                                        <span class="help-block m-b-none"></span>
+                                    </div>
+                                </div>  
+								
+								<div class="form-group ">
+                                    <div class="col-sm-2 control-label">排序</div>
+                                    <div class="col-sm-4">
+                                        <input id="" type="number" class="form-control" value="<{$info.a_sort}>" name="a_sort">
+                                        <span class="help-block m-b-none"></span>
+                                    </div>
+                                </div> 
+								
+								
+					            <div class="form-group">
+		                            <div class="col-sm-4 col-sm-offset-2">
+		                                <a href="javascript:;" id="submit" class="btn btn-warning btnbottom">立即保存</a>
+		                            </div>
+		                        </div>
+    						</div>
+        				</form>
+        				</div>
+	                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<script>
+	$(function(){
+		$("#submit").click(function (){
+			var $form = $("#form1");
+			$.ajax({
+				url:"<{php}>echo url('area/'.$action)<{/php}>",
+				data:$form.serialize(),
+				type:'post',
+				dataType:'json',
+				success:function(d){
+					if(d.stat == '1'){
+						swal({
+							title: "太帅了",
+							text: d.msg?d.msg:'操作成功！',
+							type: "success"
+						},function(){
+							location.href="<{:url('area/index')}>";
+						});
+					}else{
+						swal({
+							title: "出错了",
+							text: d.msg?d.msg:'操作失败',
+							type: "error"
+						});
+					}
+				},
+				error:function(d){
+					swal({
+						title: "出错了",
+						text: d.msg?d.msg:'操作失败',
+						type: "error"
+					});
+				}
+			});
+		});
+	});
+    </script>
+<{include file="public/footer"}>

@@ -1,0 +1,42 @@
+<{include file="public/header" }>
+    <link type="text/css" rel="stylesheet" href="/static/css/plugins/iCheck/custom.css">
+	<link rel="stylesheet" type="text/css" href="/static/css/plugins/webuploader/webuploader.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/webuploader-demo.css">
+    <!--日期-->
+    <!-- layerDate plugin javascript -->
+<script src="/static/js/plugins/layer/laydate/laydate.js"></script>
+    <style>
+    	 body {
+        background: #f3f3f4;
+    }
+    </style>
+    <script type="text/javascript" charset="utf-8" src="/static/js/plugins/iCheck/icheck.min.js"></script>
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="tabs-container ibox-title">
+                    <ul class="nav nav-tabs ">
+                            <li class="active"><a href="javascript:;">订单详情</a></li>
+                    </ul>
+                    <div class="ibox-content">
+                        <div class="">
+                            <form class="form-horizontal" id="form1" onclick="return false">
+                               <div class="panel-heading">
+                                </div> 
+                                <div class="">
+                                    <table class="table">
+                                        <tr><td>用户ID:<{$info.member.id}></td><td>用户名:<{$info.member.uname}></td><td></td></tr>
+                                         <tr><td>充值前：</td><td>金额：<{$info.amount}></td><td></td></tr>
+                                         <tr><td>订单号：<{$info.sn}></td><td>快捷支付单号：<{$info.outer_sn}></td><td></td></tr>
+                                         <tr><td>支付类型：<{$info.type==1?"刷卡":"升级"}></td><td>支付通道：<{$info.channel_id}></td><td></td></tr>
+                                         <tr><td>添加时间：<{$info.add_time}></td><td>交易成功时间：<{$info.finish_time}></td><td></td></tr>
+                                    </table>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <{include file="public/footer" }>

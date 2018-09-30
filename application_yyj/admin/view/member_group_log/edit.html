@@ -1,0 +1,161 @@
+<{include file="public/header" }>
+    <link type="text/css" rel="stylesheet" href="/static/css/plugins/iCheck/custom.css">
+	<link rel="stylesheet" type="text/css" href="/static/css/plugins/webuploader/webuploader.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/webuploader-demo.css">
+    <!--日期-->
+    <!-- layerDate plugin javascript -->
+<script src="/static/js/plugins/layer/laydate/laydate.js"></script>
+    <style>
+    	 body {
+        background: #f3f3f4;
+    }
+    </style>
+    <script type="text/javascript" charset="utf-8" src="/static/js/plugins/iCheck/icheck.min.js"></script>
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="tabs-container ibox-title">
+                    <ul class="nav nav-tabs ">
+                            <li class="active"><a href="javascript:;">订单详情</a></li>
+                    </ul>
+                    <div class="ibox-content">
+                        <div class="">
+                                      <table class="table">
+                                          <tr><td>用户名：<{$info.member.uname}></td><td>状态：<{$info["stat"]==1?'成功':'失败'}></td></tr>
+                                             <tr><td>升级前：<{$info.low_group}></td><td>升级后：<{$info.heigh_group}></td></tr>
+                                              <tr><td>订单号：<{$info.order.sn}></td><td>金额：￥<{$info.order.amount}>元</td></tr>
+                                              <tr><td>添加时间：<{$info.order.add_time}></td><td>完成时间：<{$info.order.finish_time}></td></tr>
+                                              <tr><td>备注：由<{$info.low_group}>升级到<{$info.heigh_group}></td><td></td></tr>
+                                      </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var add_url="<{:url('channel/add')}>";
+        var edit_url="<{:url('channel/edit')}>";
+    function hider($type) {
+        var $class_text = $(".class_text");
+        var $class_photo = $(".class_photo");
+
+        if ($type == '1') {
+            $class_text.show(300);
+            $class_photo.hide(300);
+        } else if ($type == '2') {
+            $class_text.hide(300);
+            $class_photo.hide(300);
+        } else {
+            $class_text.hide(300);
+            $class_photo.show(300);
+        }
+    }
+    $(function() {
+        $("#submit").click(function() {
+            var $form = $("#form1");
+            if($("[name='id']").val()){
+                
+                var url=edit_url;
+            }else{
+                var url=add_url;
+            }
+            $.ajax({
+                url: url,
+                data: $form.serialize(),
+                type: 'post',
+                dataType: 'json',
+                success: function(d) {
+                    if (d.stat == '1') {
+                        swal({
+                            title: "太帅了",
+                            text: d.msg ? d.msg : '操作成功！',
+                            type: "success"
+                        }, function() {
+                            location.href = "<{:url('channel/index')}>";
+                        });
+                    } else {
+                        swal({
+                            title: "出错了",
+                            text: d.msg ? d.msg : '操作失败',
+                            type: "error"
+                        });
+                    }
+                },
+                error: function(d) {
+                    swal({
+                        title: "出错了",
+                        text: d.msg ? d.msg : '操作失败',
+                        type: "error"
+                    });
+                }
+            });
+        });
+    });
+    </script>
+   	<script>
+        //日期范围限制
+        var start = {
+            elem: '#start',
+            format: 'YYYY-MM-DD hh:mm:ss',
+            //min: laydate.now(), //设定最小日期为当前日期
+            min: '2017-12-31 23:59:59', //设定最小日期为当前日期
+            max: '2099-12-31 23:59:59', //最大日期
+            istime: true,
+            istoday: false,
+            choose: function (datas) {
+                end.min = datas; //开始日选好后，重置结束日的最小日期
+                end.start = datas //将结束日的初始值设定为开始日
+            }
+        };
+         var end = {
+            elem: '#end',
+            format: 'YYYY-MM-DD hh:mm:ss',
+            //min: laydate.now(),
+            min: '2017-12-31 23:59:59',
+            max: '2099-12-31 23:59:59',
+            istime: true,
+            istoday: true,
+            choose: function (datas) {
+                start.max = datas; //结束日选好后，重置开始日的最大日期
+            }
+        };
+        laydate(start);
+        laydate(end);
+        var pay_types=$(".pay_type option");
+        $(".pay_type").empty();
+        $(".type").change(function(){
+            var id=$(this).val();
+            $(".pay_type").empty();
+            var str="";
+            for(var i=0;i<pay_types.length;i++){
+                if(pay_types.eq(i).hasClass(id)){
+                                   $(".pay_type").append(pay_types[i]);
+                }
+
+            }
+        })
+        //初始化通道
+        if($("[name='name']").val()){
+            var id=$(".type").val();
+            var type=$(".pay_type").attr("data-v");
+            console.log(type);
+            for(var i=0;i<pay_types.length;i++){
+                if(pay_types.eq(i).hasClass(id)){
+                                    if(type==pay_types.eq(i).attr("value")){
+
+                                    }
+                                   $(".pay_type").append($(pay_types[i]));
+                }
+
+            }
+            $(".pay_type option").each(function(){
+                if($(this).attr("value")==type){
+                    $(this).attr("selected","selected");
+                }
+                
+            })
+        }
+    </script>
+    <{include file="public/footer" }>

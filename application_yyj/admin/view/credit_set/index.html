@@ -1,0 +1,267 @@
+<{include file="public/header" }>
+    <link type="text/css" rel="stylesheet" href="/static/css/plugins/iCheck/custom.css">
+	<link rel="stylesheet" type="text/css" href="/static/css/plugins/webuploader/webuploader.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/webuploader-demo.css">
+    <style>
+    	 body {
+        background: #f3f3f4;
+    }
+    .col-sm-4 .form-control{
+        
+        width:90%;
+    }
+    .col-sm-4 .form-control,.help-block{
+        
+        display:inline-block;
+    }
+    </style>
+    <script type="text/javascript" charset="utf-8" src="/static/js/plugins/iCheck/icheck.min.js"></script>
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="tabs-container ibox-title">
+                    <ul class="nav nav-tabs ">
+                            <li class="active"><a href="javascript:;">信用卡系统设置</a></li>
+
+                    </ul>
+                    <div class="ibox-content">
+                        <div class="">
+                            <form class="form-horizontal" id="form1" onclick="return false">
+                                <div class="">
+                                    <input name="id" type="hidden"  value="<{$info['id']}>" class="form-control"/>
+                                    <div class="form-group ">
+                                        <div class="col-sm-2 control-label">单笔消费最低金额（元））</div>
+                                        <div class="col-sm-4">
+                                            <input name="min" type="number"  value="<{$info['min']}>" class="form-control"/>
+                                            <span class="help-block m-b-none">元</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group ">
+                                        <div class="col-sm-2 control-label">单笔消费最高金额（元）</div>
+                                        <div class="col-sm-4">
+                                            <input name="max" type="number"  value="<{$info['max']}>" class="form-control"/>
+                                            <span class="help-block m-b-none">元</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group ">
+                                        <div class="col-sm-2 control-label">每笔还款前刷卡次数：默认2次）</div>
+                                        <div class="col-sm-4">
+                                            <input name="num" type="number"  value="<{$info['num']}>" class="form-control"/>
+                                            <span class="help-block m-b-none"></span>
+                                        </div>
+                                    </div>
+                                 <div class="form-group ">
+                                        <div class="col-sm-2 control-label">单笔消费金额最大随机浮动比例（%）</div>
+                                        <div class="col-sm-4">
+                                            <input name="per_max" type="number"  value="<{$info['per_max']}>" class="form-control"/>
+                                            <span class="help-block m-b-none">%</span>
+                                        </div>
+                                    </div>
+                                 <div class="form-group ">
+                                        <div class="col-sm-2 control-label">每天还款金额最大随机浮动比例(%)</div>
+                                        <div class="col-sm-4">
+                                            <input name="day_max" type="number"  value="<{$info['day_max']}>" class="form-control"/>
+                                            <span class="help-block m-b-none">%</span>
+                                        </div>
+                                    </div>
+                                 <div class="form-group ">
+                                        <div class="col-sm-2 control-label">一天内多次还款金额最大随机浮动比例(%)</div>
+                                        <div class="col-sm-4">
+                                            <input name="more_day_max" type="number"  value="<{$info['more_day_max']}>" class="form-control"/>
+                                            <span class="help-block m-b-none">%</span>
+                                        </div>
+                                    </div>
+                                 <div class="form-group ">
+                                        <div class="col-sm-2 control-label">每天最大还款次数</div>
+                                        <div class="col-sm-4">
+                                            <input name="many_pay" type="number"  value="<{$info['many_pay']}>" class="form-control"/>
+                                            <span class="help-block m-b-none"></span>
+                                        </div>
+                                    </div>
+                                 <div class="form-group ">
+                                        <div class="col-sm-2 control-label">每天最大消费次数</div>
+                                        <div class="col-sm-4">
+                                            <input name="many_buy" type="number"  value="<{$info['many_buy']}>" class="form-control"/>
+                                            <span class="help-block m-b-none"></span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group ">
+                                        <div class="col-sm-2 control-label">每天交易最早时间</div>
+                                        <div class="col-sm-4">
+                                            <select name="time_start" class="form-control form_datetime">
+                                                <{for start="0" end="24"}>
+                                                <option value="<{$i}>:00"        <{if condition="$i eq $info.time_start"}>selected<{/if}>><{$i}>:00</option>
+                                                <{/for}>
+                                            </select>
+                                            <span class="help-block m-b-none"></span>
+                                        </div>
+                                    </div> 
+                                    <div class="form-group ">
+                                        <div class="col-sm-2 control-label">每天交易最晚时间</div>
+                                        <div class="col-sm-4">
+                                            <select name="time_end" class="form-control form_datetime">
+                                                <{for start="0" end="24"}>
+                                                <option value="<{$i}>:00"        <{if condition="$i eq $info.time_end"}>selected<{/if}>><{$i}>:00</option>
+                                                <{/for}>
+                                            </select>
+                                            <span class="help-block m-b-none"></span>
+                                        </div>
+                                    </div> 
+                                 <div class="form-group ">
+                                        <div class="col-sm-2 control-label">两次交易时间间隔最小</div>
+                                        <div class="col-sm-4">
+                                            <input name="interval_time" type="number"  value="<{$info['interval_time']}>" class="form-control"/>
+                                            <span class="help-block m-b-none">分钟</span>
+                                        </div>
+                                    </div>
+                                       <div class="form-group ">
+                                        <div class="col-sm-2 control-label">两次交易时间间隔最大随机浮动</div>
+                                        <div class="col-sm-4">
+                                            <input name="interval_large" type="number"  value="<{$info['interval_large']}>" class="form-control"/>
+                                            <span class="help-block m-b-none">分钟</span>
+                                        </div>
+                                    </div>
+                                       <div class="form-group ">
+                                        <div class="col-sm-2 control-label">刷卡费率</div>
+                                        <div class="col-sm-4">
+                                            <input name="rate" type="number"  value="<{$info['rate']}>" class="form-control"/>
+                                            <span class="help-block m-b-none">%</span>
+                                        </div>
+                                    </div>
+                                           <div class="form-group">
+                                        <div class="col-sm-2 control-label">代付费</div>
+                                        <div class="col-sm-4">
+                                            <input name="single_payment" type="number"  value="<{$info['single_payment']}>" class="form-control"/>
+                                            <span class="help-block m-b-none">元</span>
+                                        </div>
+                                    </div>
+                                           <div class="form-group ">
+                                        <div class="col-sm-2 control-label">还款代付费</div>
+                                        <div class="col-sm-4">
+                                            <input name="single_back" type="number"  value="<{$info['single_back']}>" class="form-control"/>
+                                            <span class="help-block m-b-none">元</span>
+                                        </div>
+                                    </div>
+                                           <div class="form-group ">
+                                        <div class="col-sm-2 control-label">还款方式</div>
+                                        <div class="col-sm-4">
+                               <div class="checkbox i-checks">
+                                    <label>
+                                        <input type="checkbox" value="5" name="pay_way[]" <{if condition="in_array('5',$info['pay_way'])" }>checked<{/if}>>
+                                        <i></i> 5%
+                                    </label>
+                                </div>
+                                  <div class="checkbox i-checks">
+                                    <label>
+                                        <input type="checkbox" value="10" name="pay_way[]" <{if condition="in_array('10',$info['pay_way'])" }>checked<{/if}>>
+                                        <i></i> 10%
+                                    </label>
+                                </div>
+                                  <div class="checkbox i-checks">
+                                    <label>
+                                        <input type="checkbox" value="15" name="pay_way[]" <{if condition="in_array('15',$info['pay_way'])" }>checked<{/if}>>
+                                        <i></i> 15%
+                                    </label>
+                                </div> 
+                                  <div class="checkbox i-checks">
+                                    <label>
+                                        <input type="checkbox" value="30" name="pay_way[]" <{if condition="in_array('30',$info['pay_way'])" }>checked<{/if}>>
+                                        <i></i> 30%
+                                    </label>
+                                </div>    
+                                  <div class="checkbox i-checks">
+                                    <label>
+                                        <input type="checkbox" value="45" name="pay_way[]" <{if condition="in_array('45',$info['pay_way'])" }>checked<{/if}>>
+                                        <i></i> 45%
+                                    </label>
+                                </div> 
+                                  <div class="checkbox i-checks">
+                                    <label>
+                                        <input type="checkbox" value="60" name="pay_way[]" <{if condition="in_array('60',$info['pay_way'])" }>checked<{/if}>>
+                                        <i></i> 60%
+                                    </label>
+                                </div> 
+                                  <div class="checkbox i-checks">
+                                    <label>
+                                        <input type="checkbox" value="80" name="pay_way[]" <{if condition="in_array('80',$info['pay_way'])" }>checked<{/if}>>
+                                        <i></i> 80%
+                                    </label>
+                                </div> 
+                                            <span class="help-block m-b-none"></span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-sm-4 col-sm-offset-2">
+                                            <a href="javascript:;" id="submit" class="btn btn-warning btnbottom">立即保存</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<script src="/static/js/plugins/validate/jquery.validate.min.js"></script>
+<script src="/static/js/plugins/validate/messages_zh.min.js"></script>
+    <script>
+        var url="<{:url('CreditSet/edit')}>";
+        var index="<{:url('CreditSet/index')}>";
+    function hider($type) {
+        var $class_text = $(".class_text");
+        var $class_photo = $(".class_photo");
+
+        if ($type == '1') {
+            $class_text.show(300);
+            $class_photo.hide(300);
+        } else if ($type == '2') {
+            $class_text.hide(300);
+            $class_photo.hide(300);
+        } else {
+            $class_text.hide(300);
+            $class_photo.show(300);
+        }
+    }
+    $(function() {
+        $(".i-checks").iCheck({checkboxClass: "icheckbox_square-green", radioClass: "iradio_square-green",})
+
+        $("#submit").click(function() {
+            var $form = $("#form1");
+            $.ajax({
+                url: url,
+                data: $form.serialize(),
+                type: 'post',
+                dataType: 'json',
+                success: function(d) {
+                    if (d.stat == '1') {
+                        swal({
+                            title: "太帅了",
+                            text: d.msg ? d.msg : '操作成功！',
+                            type: "success"
+                        }, function() {
+                            location.href = index;
+                        });
+                    } else {
+                        swal({
+                            title: "出错了",
+                            text: d.msg ? d.msg : '操作失败',
+                            type: "error"
+                        });
+                    }
+                },
+                error: function(d) {
+                    swal({
+                        title: "出错了",
+                        text: d.msg ? d.msg : '操作失败',
+                        type: "error"
+                    });
+                }
+            });
+        });
+    });
+
+    </script>
+    <{include file="public/footer" }>

@@ -1,0 +1,170 @@
+<{include file="public/header" }>
+    <style>
+    body {
+        background: #f3f3f4;
+    }
+    </style>
+    <link type="text/css" rel="stylesheet" href="/static/css/plugins/iCheck/custom.css">
+    <script type="text/javascript" charset="utf-8" src="/static/js/plugins/iCheck/icheck.min.js"></script>
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="tabs-container ibox-title">
+                    <ul class="nav nav-tabs ">
+                        <{if condition="$action eq 'postionlist'" }>
+                            <li class="active"><a href="javascript:;">广告位管理</a></li>
+                            <li><a class="icon iconfont icon-favor_light" href="<{:url('advpos/add')}>" class="jf_sub_menu">新增/修改广告位</a></li>
+                            <{else}>
+                                <li><a class="icon iconfont icon-favor_light" href="<{:url('advpos/index')}>" class="jf_sub_menu">广告位管理</a></li>
+                                <li class="active"><a href="javascript:;">新增/修改广告位</a></li>
+                                <{/if}>
+                    </ul>
+                    <div class="ibox-content">
+                        <div class="">
+                            <form class="form-horizontal" id="form1" onclick="return false">
+                                <!-- <div class="panel-heading ibox-title">
+								<{switch name="action"}>
+									<{case value="padd"}>添加新<{/case}>
+									<{case value="pedit"}>修改<{/case}>
+								<{/switch}>广告位置
+							</div> -->
+                                <div class="">
+                                    <input type="hidden" value="<{$info.id}>" name="id">
+                                    <div class="form-group ">
+                                        <div class="col-sm-2 control-label">名称</div>
+                                        <div class="col-sm-4">
+                                            <input id="formitem_1" type="text" class="form-control" value="<{$info.name}>" name="name">
+                                            <span class="help-block m-b-none"></span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group ">
+                                        <div class="col-sm-2 control-label">类别</div>
+                                        <div class="col-sm-4">
+                                            <div class="checkbox i_checks" style="display: inline-block;">
+                                                <label class="">
+                                                    <div class="iradio_square-green" style="position: relative;">
+                                                        <input readonly="readonly" type="radio" value="0" name="type" style="position: absolute; opacity: 0;" <{if condition="$info.type eq 0" }>checked
+                                                        <{/if}>>
+                                                            <ins class="iCheck-helper" style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; height: 100%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
+                                                    </div>图片 &nbsp;&nbsp;&nbsp;&nbsp;
+                                                </label>
+                                            </div>
+                                            <div class="checkbox i_checks" style="display: inline-block;">
+                                                <label class="">
+                                                    <div class="iradio_square-green" style="position: relative;">
+                                                        <input readonly="readonly" type="radio" value="1" name="type" style="position: absolute; opacity: 0;" <{if condition="$info.type eq 1" }>checked
+                                                        <{/if}>>
+                                                            <ins class="iCheck-helper" style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; height: 100%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
+                                                    </div>文字 &nbsp;&nbsp;&nbsp;&nbsp;
+                                                </label>
+                                            </div>
+                                            <script>
+                                            ;
+                                            $('.i_checks').iCheck({ checkboxClass: 'icheckbox_square-green', radioClass: 'iradio_square-green', });
+                                            </script>
+                                        </div>
+                                    </div>
+                                    <div class="form-group ">
+                                        <div class="col-sm-2 control-label">状态</div>
+                                        <div class="col-sm-4">
+                                            <div class="checkbox i_checks" style="display: inline-block;">
+                                                <label class="">
+                                                    <div class="iradio_square-green" style="position: relative;">
+                                                        <input type="radio" value="0" name="stat" style="position: absolute; opacity: 0;" <{if condition="$info.stat eq 0" }>checked
+                                                        <{/if}>>
+                                                            <ins class="iCheck-helper" style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; height: 100%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
+                                                    </div>禁用 &nbsp;&nbsp;&nbsp;&nbsp;
+                                                    
+                                            </div>
+                                            <div class="checkbox i_checks" style="display: inline-block;">
+                                                <label class="">
+                                                    <div class="iradio_square-green" style="position: relative;">
+                                                        <input type="radio" value="1" name="stat" style="position: absolute; opacity: 0;" <{if condition="$info.type eq 1" }>checked
+                                                        <{/if}>>
+                                                            <ins class="iCheck-helper" style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; height: 100%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
+                                                    </div>启用 &nbsp;&nbsp;&nbsp;&nbsp;</label>
+                                            </div>
+                                            <script>
+                                            ;
+                                            $('.i_checks').iCheck({ checkboxClass: 'icheckbox_square-green', radioClass: 'iradio_square-green', });
+                                            </script>
+                                            <span class="help-block m-b-none"></span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group class_photo" style="">
+                                        <label class="col-sm-2 control-label">宽度</label>
+                                        <div class="col-sm-4">
+                                            <input id="formitem_5" type="number" min="0" max="500" class="form-control" value="<{$info.width}>" name="ap_width">
+                                            <span class="help-block m-b-none"></span>
+                                        </div>
+                                    </div>
+                                    <script>
+                                    $("#formitem_5").keyup(function() {
+                                        var val = parseInt($(this).val()) || '0';
+                                        $(this).val(val);
+                                    });
+                                    </script>
+                                    <div class="form-group class_photo" style="">
+                                        <label class="col-sm-2 control-label">高度</label>
+                                        <div class="col-sm-4">
+                                            <input id="formitem_6" type="number" min="0" max="500" class="form-control" value="<{$info.height}>" name="ap_height">
+                                            <span class="help-block m-b-none"></span>
+                                        </div>
+                                    </div>
+                                    <script>
+                                    $("#formitem_6").keyup(function() {
+                                        var val = parseInt($(this).val()) || '0';
+                                        $(this).val(val);
+                                    });
+                                    </script>
+                                    <div class="form-group">
+                                        <div class="col-sm-4 col-sm-offset-2">
+                                            <a href="javascript:;" id="submit" class="btn btn-warning btnbottom">立即保存</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<script>
+    $(function() {
+        $("#submit").click(function() {
+            var $form = $("#form1");
+            $.ajax({
+                url: "<{php}>echo url('advpos/'.$action)<{/php}>",
+                data: $form.serialize(),
+                type: 'post',
+                dataType: 'json',
+                success: function(d) {
+                    if (d.stat == '1') {
+                        swal({
+                            title: "太帅了",
+                            text: d.msg ? d.msg : '操作成功！',
+                            type: "success"
+                        }, function() {
+                            location.href = "<{:url('advpos/index')}>";
+                        });
+                    } else {
+                        swal({
+                            title: "出错了",
+                            text: d.msg ? d.msg : '操作失败',
+                            type: "error"
+                        });
+                    }
+                },
+                error: function(d) {
+                    swal({
+                        title: "出错了",
+                        text: d.msg ? d.msg : '操作失败',
+                        type: "error"
+                    });
+                }
+            });
+        });
+    });
+    </script>
+    <{include file="public/footer" }>

@@ -1,0 +1,183 @@
+    <{include file="public/header" }>
+    <link type="text/css" rel="stylesheet" href="/static/css/plugins/iCheck/custom.css">
+    <script type="text/javascript" charset="utf-8" src="/static/js/plugins/iCheck/icheck.min.js"></script>
+<style>
+    body{
+        background: #f3f1f3;
+    }
+</style>
+<div class="wrapper wrapper-content animated fadeInRight" title="新增/修改文章" fit=true>
+    <div style="ibox">
+        <div class="ibox-title">
+            即时通知
+        </div>
+        <div class="ibox-content">
+            <form method="post" class="form-horizontal" id="form1">
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">标题</label>
+                  <input type="hidden" class="form-control" name="id" value="<{$info.id}>">
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" name="title" value="<{$info.title}>">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">开始时间</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" name="start" value="<{$info.start}>" id="start">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">结束时间</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" name="end" value="<{$info.end}>" id="end">
+                    </div>
+                </div>
+                <div class="hr-line-dashed"></div>
+                <div class="form-group ">
+                    <label class="col-sm-2 control-label">状态</label>
+                    <div class="col-sm-4">
+                        <div class="checkbox i_checks" style="display: inline-block;">
+                            <label class="">
+                                <div class="iradio_square-green" style="position: relative;">
+                                    <input type="radio" value="0" name="stat" style="position: absolute; opacity: 0;"  <{if condition="$info.stat neq 1"}> checked<{/if}>>
+                                    <ins class="iCheck-helper" style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; height: 100%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
+                                </div>禁用 &nbsp;&nbsp;&nbsp;&nbsp;
+                            </label>
+                        </div>
+                        <div class="checkbox i_checks" style="display: inline-block;">
+                            <label class="">
+                                <div class="iradio_square-green" style="position: relative;" >
+                                    <input type="radio" value="1" name="stat" style="position: absolute; opacity: 0;" <{$info.stat==1?'checked':''}>>
+                                    <ins class="iCheck-helper" style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; height: 100%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
+                                </div>启用 &nbsp;&nbsp;&nbsp;&nbsp;
+                            </label>
+                        </div>
+                        <script>
+                        ;
+                        $('.i_checks').iCheck({ checkboxClass: 'icheckbox_square-green', radioClass: 'iradio_square-green', });
+                        </script>
+                        <span class="help-block m-b-none"></span>
+                    </div>
+                </div>
+                <div class="hr-line-dashed"></div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">简介</label>
+                    <div class="col-sm-10">
+                        <textarea name="content" class="form-control input-lg m-b"><{$info.content}> </textarea>
+                    </div>
+                </div>
+                <div class="hr-line-dashed"></div>
+                <div class="form-group">
+                    <div class="col-sm-4 col-sm-offset-2">
+                        <a class="btn btn-primary" type="bottun" id="submit">保存内容</a>
+                        <input class="btn btn-white" type="reset" value="取消"></input>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+<script src="/static/js/plugins/layer/laydate/laydate.js"></script>
+
+    <script>
+     var start = {
+        elem: "#start",
+        format: "YYYY-MM-DD hh:mm:ss",
+        min: "2018-01-0 23:59:59",
+        max: "2099-06-16 23:59:59",
+        istime: true,
+        istoday: false,
+        choose: function (datas) {
+            end.min = datas;
+            end.start = datas
+        }
+    };
+    var end = {
+        elem: "#end",
+        format: "YYYY-MM-DD hh:mm:ss",
+        min: "2018-01-0 23:59:59",
+        max: "2099-06-16 23:59:59",
+        istime: true,
+        istoday: false,
+        choose: function (datas) {
+            start.max = datas
+        }
+    };
+    laydate(start);
+    laydate(end);
+    function edit() {
+            $("#eg").addClass("no-padding");
+            $('.click2edit').summernote({
+                lang: 'zh-CN',
+                focus: true
+            });
+        };
+        $(document).ready(function () {
+
+            $('.summernote').summernote({
+                lang: 'zh-CN'
+            });
+
+        });
+         
+        var save = function () {
+            $("#eg").removeClass("no-padding");
+            var aHTML = $('.click2edit').code(); //save HTML If you need(aHTML: array).
+            $('.click2edit').destroy();
+        };
+ 
+    </script>
+<script>
+    var add_url="<{:url('MsgAdmin/add')}>";
+    var edit_url="<{:url('MsgAdmin/edit')}>";
+        $("#submit").click(function(e) {
+            var type;
+            type=$("#type").val();
+            if(type==1){
+                $("#code").val('1');
+            }
+            var content;
+            content=$("#content").html();
+            $("#content1").val(content);
+            var $form = $("#form1");
+            if($("[name='id']").val()){
+                
+                var url=edit_url;
+            }else{
+                var url=add_url;
+            }
+            $.ajax({
+                url: url,
+                data: $form.serialize(),
+                type: 'post',
+                dataType: 'json',
+                success: function(d) {
+                    if (d.stat == '1') {
+                        swal({
+                            title: "太帅了",
+                            text: d.msg ? d.msg : '操作成功！',
+                            type: "success"
+                        }, function() {
+                            location.href = add_url;
+                        });
+                    } else {
+                        swal({
+                            title: "出错了",
+                            text: d.msg ? d.msg : '操作失败',
+                            type: "error"
+                        });
+                    }
+                },
+                error: function(d) {
+                    swal({
+                        title: "出错了",
+                        text: d.msg ? d.msg : '操作失败',
+                        type: "error"
+                    });
+                }
+            });
+        });
+    
+ </script>
+
+   
+    <{include file="public/footer" }>

@@ -1,0 +1,200 @@
+<{include file="public/header" }>
+    <script type="text/javascript" charset="utf-8" src="/static/js/plugins/bootstrap-table/bootstrap-table.min.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/static/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js"></script>
+    <link rel="stylesheet" href="/static/css/plugins/bootstraptable/bootstrap-table.min.css">
+    
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title" style=" padding-bottom: 0;">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href="javascript:;">广告位管理</a></li>
+                    <li><a class="icon iconfont icon-favor_light" href="<{:url('advpos/add')}>" class="jf_sub_menu">新增/修改广告位</a></li>
+                </ul>
+            </div>
+            <div class="ibox-content">
+                <div class="row row-lg">
+                    <div class="col-sm-12">
+                        <!-- Example Events -->
+                        <div class="example-wrap">
+                            <div class="example">
+                                <div class="hidden-xs" id="exampleTableEventsToolbar" role="group">
+                                    <button type="button" class="btn btn-sm btn-primary" id="btnadd">
+                                        <i class="glyphicon glyphicon-plus" aria-hidden="true"></i> 添加广告位
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-white" id="btndel">
+                                        <i class="glyphicon glyphicon-trash" aria-hidden="true"></i> 删除广告位
+                                    </button>
+                                </div>
+                                <!---search start-->
+                                <div class="right">
+                                    <span style=" line-height: 30px; margin-right: 5px;">广告位名:</span>
+                                    <input type="text" id="ap_name" value="" class="input_zdy input-sm" size=15 placeholder="包含的字符" />
+                                    <a href="javascript:;" id="btnsearch" class="btn btn-primary btn-sm">查询</a>
+                                </div>
+                                <!---search end---->
+                                <table id="dg" data-height="100%" data-mobile-responsive="true">
+                                </table>
+                            </div>
+                        </div>
+                        <!-- End Example Events -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+    function getQueryParams() {
+        var q = {};
+        q.ap_name = $("#ap_name").val();
+        return q;
+    }
+    $("#btnsearch").click(function() {
+        q = getQueryParams();
+        var url = "<{:url('advpos/listajax')}>";
+        $("#dg").bootstrapTable('refresh', { url: url, query: q });
+    })
+    $("#btnadd").click(function() {
+        location.href = "<{:url('advpos/add')}>";
+    })
+    $("#btndel").click(function(){
+    	var items = $("#dg").bootstrapTable('getSelections');
+    	items = objcolum(items,'id');
+    	if(items.length <= 0){
+    		swal("出错了", "请选择要删除的值", "error");
+    	}else{
+			del(items);
+		}
+    });
+
+    function del(ids) {
+        swal({
+			title: "您确定要删除这条信息吗",
+			text: "删除后将无法恢复，请谨慎操作！",
+			type: "warning",
+			showCancelButton: true,
+			confirmButtonColor: "#DD6B55",
+			confirmButtonText: "删除",
+			closeOnConfirm: false
+		},function(isConfirm) {
+			var cur=0;
+			if (isConfirm) {
+				if (!$.isArray(ids)) {
+					ids = [ids];
+				}
+				$.ajax({
+					url: "<{:url('advpos/del')}>",
+					data: { id: ids },
+					type: 'post',
+					dataType: 'json',
+					success: function(ret) {	
+						if(ret.stat == 1){
+							swal({
+								title: "太帅了",
+								text: ret.msg?ret.msg:'操作成功！',
+								type: "success"
+							},function(){
+								location.href="<{:url('advpos/index')}>";
+							});
+						}else{
+							swal("操作失败", ret.msg, "error");
+						}
+						
+					}
+				});
+			} else {
+				swal("已取消", "您取消了删除操作！", "error");
+			}
+		});
+    }
+
+
+    $(function() {
+        $('#dg').bootstrapTable({
+            url: "<{:url('advpos/listajax')}>",
+            //method:'post',
+            queryParams: function(params) {
+                params.p = parseInt(params.offset / params.limit) + 1;
+                params = $.extend(params, getQueryParams());
+                return params;
+            },
+            queryParamsType: "limit",
+            contentType: 'application/json',
+            dataType: 'json',
+            sidePagination: "server", //表示服务端请求
+            pagination: true, //启动分页
+            pageNumber: 1, //当前第几页
+            pageSize: 20, //每页显示的记录数
+            pageList: [10, 15, 20], //记录数可选列表
+            dataField: 'rows',
+            idField: "id",
+            columns: [{ checkbox: true, align: 'center', valign: 'middle' },
+                { title: '名称', field: 'name', align: 'center', valign: 'middle' },
+                { title: '类型', field: 'typeText', align: 'center', valign: 'middle' },
+                {
+                    title: '启用',
+                    field: 'stat',
+                    align: 'center',
+                    valign: 'middle',
+                    formatter: function(value, row, index) {
+                        var html = '';
+                        if (row.ap_stat == '1') {
+                            html = '<i class="fa fa-toggle-on infoOn"></i>';
+                        } else {
+                            html = '<i class="fa fa-toggle-on infoOff "></i>';
+                        }
+                        return html;
+                    }
+                },
+                {
+                    title: '尺寸',
+                    field: 'e_initial',
+                    align: 'center',
+                    valign: 'middle',
+                    formatter: function(value, row, index) {
+                        var html = '';
+                        if (row.type == '0') {
+                            html = row.width + '*' + row.height;
+                        } else {
+                            html = '---';
+                        }
+                        return html;
+                    }
+                },
+                {
+                    title: '操作',
+                    field: 'n_do',
+                    align: 'center',
+                    valign: 'middle',
+                    formatter: function(value, row, index) {
+                        var html = '';
+                        html = '<a href="<{:url(\'ad/index\')}>?ap_id=' + row.id + '" class="btn btn-warning btn-sm" data-toggle="tooltip" data-placement="top" title="" data-original-title="查看下级" style=" margin-right:4px;"><span class="glyphicon glyphicon glyphicon-sort-by-attributes-alt"></span> 查看下级</a><a href="<{:url(\'ad/add\')}>?ap_id=' + row.id + '" class="btn btn-warning btn-sm" data-toggle="tooltip" data-placement="top" title="" data-original-title="添加下级" style=" margin-right:4px;"><span class="glyphicon glyphicon-plus"></span> 添加下级</a><a href="<{:url(\'advpos/edit\')}>?id=' + row.id + '" class="btn btn-warning btn-sm" data-toggle="tooltip" data-placement="top" title="编辑" style=" margin-right:4px;"><span class="glyphicon glyphicon-edit"></span> 编辑</a><a href="javascript:;" onclick="del(' + row.id + ')" class="btn btn-warning btn-sm" data-toggle="tooltip" data-placement="top" title="删除" style=" margin-right:4px;"><span class="glyphicon glyphicon-remove"></span> 删除</a>';
+                        return html;
+                    }
+                }
+            ],
+            responseHandler: function(res) {
+                //远程数据加载之前,处理程序响应数据格式,对象包含的参数: 我们可以对返回的数据格式进行处理
+                //在ajax后我们可以在这里进行一些事件的处理
+                return res;
+            },
+            search: false,
+            iconSize: 'outline',
+            toolbar: '#exampleTableEventsToolbar',
+            icons: {
+                refresh: 'glyphicon-repeat',
+                toggle: 'glyphicon-list-alt',
+                columns: 'glyphicon-list'
+            },
+            toolbarAlign: 'left',
+            showToggle: false,
+            showColumns: false, //显示下拉框勾选要显示的列
+            // minimumCountColumns:3, 
+            showRefresh: true, //显示刷新按钮
+            striped: true, //表格显示条纹
+            singleSelect: false, //复选框只能选择一条记录  
+            clickToSelect: false, //点击行即可选中单选/复选框  
+            checkboxHeader: true
+        });
+    });
+    </script>
+    <{include file="public/footer" }>

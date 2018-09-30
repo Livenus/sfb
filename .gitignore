@@ -1,0 +1,10 @@
+config.php
+database.php
+composer.lock
+composer.json
+build.php
+.travis.yml
+.idea
+composer.lock
+*.log
+thinkphp

@@ -1,0 +1,168 @@
+<{include file="public/header" /}>
+<link href="/static/css/rule.css" rel="stylesheet" type="text/css">
+<link href="/static/css/plugins/iCheck/custom.css" rel="stylesheet">
+<style>
+    .pid_2{font-size: 13px;
+     margin-left: 20px;}
+</style>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="ibox float-e-margins">
+        <form method="POST" action="" name="theFrom" id="theFrom">
+            <input type="hidden" name="id" value="<{$group_data['id']}>">
+            <div class="list-div">
+                <table width="100%">
+                    <tr>
+                        <td class="">角色名</td>
+                        <td><input type="text" class="form-control" maxlength="20" value="<{$group_data['title']}>" disabled size="34"/></td>
+                    </tr>
+                    <tr>
+                        <td class="">角色描述</td>
+                        <td>
+                            <textarea name="role_describe" cols="31" rows="6" class="form-control"><{$group_data['describe']}></textarea>
+                        </td>
+                    </tr>
+                </table>
+                <table cellspacing='1' id="list-table">
+                    <{foreach name="menu" item="priv"}>
+                    <tr>
+                        <td width="18%" valign="top" class="first-cell">
+                            <input type="checkbox" class="i-checks check" name="rule_ids[]" value="<{$priv['id']}>"  <{if condition="in_array($priv['id'],$group_data['rules'])"}> checked="true" <{/if}>><{$priv['title']}>
+                            <!-- <input name="chkGroup" type="checkbox" value="checkbox" onclick="check('<{$priv.priv_list}>',this);" class="checkbox"><{$priv['title']}> -->
+                        </td>
+                        <td>
+                            <{foreach name="priv['pid1']" item="priv_list"}>
+                            <div style="width:120px;float:left;">
+                                <!-- <label for="{$priv_list}"><input type="checkbox" name="action_code[]" value="<{$priv_list['name']}>" id="<{$priv_list['name']}>" class="checkbox" {if $list.cando eq 1} checked="true" {/if} onclick="checkrelevance('{$list.relevance}', '{$priv_list}')" title=""/> -->
+                                <label for="<{$priv_list['name']}>"><input type="checkbox" class="i-checks check child" name="rule_ids[]" value="<{$priv_list['id']}>" id="<{$priv_list['name']}>" <{if condition="in_array($priv_list['id'],$group_data['rules'])"}> checked="true" <{/if}>>
+                                                                           <{$priv_list['title']}></label>
+                                  <table class="pid_2">
+                                        <{foreach name="priv_list['pid_2']" item="priv_list2"}>
+                                      <tr><td>                                <label for="<{$priv_list2['name']}>"><input type="checkbox" class="i-checks check child" name="rule_ids[]" value="<{$priv_list2['id']}>" id="<{$priv_list2['name']}>" <{if condition="in_array($priv_list2['id'],$group_data['rules'])"}> checked="true" <{/if}>>
+                                                                           <{$priv_list2['title']}></label></td></tr>
+                                         <{/foreach}>
+                                  </table>
+                            </div>
+                            <{/foreach}>
+                        </td>
+                    </tr>
+                    <{/foreach}>
+                    <tr>
+                        <td align="center" colspan="2" >
+                            <input type="checkbox" value="" name="checkall" class="i-checks"/>全选
+                            &nbsp;&nbsp;&nbsp;&nbsp;
+                            <input type="button"  id="btn" name="Submit"   value="保存" class="btn btn-primary" />&nbsp;&nbsp;&nbsp;
+                            <input type="reset" value="重置" class="btn btn-primary btn-outline" />
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- iCheck -->
+<script src="/static/js/plugins/iCheck/icheck.min.js"></script>
+<script>
+    $(document).ready(function () {
+        var theForm = $('input[name=theFrom]');
+        $('.i-checks').iCheck({
+            checkboxClass: 'icheckbox_square-green',
+            radioClass: 'iradio_square-green',
+        });
+        var checkboxes = $('input.check');
+
+        var checkAll = $('input[name=checkall]');
+
+        checkAll.on('ifChecked ifUnchecked', function (event) {
+            if (event.type == 'ifChecked') {
+                checkboxes.iCheck('check');
+            } else {
+                checkboxes.iCheck('uncheck');
+            }
+        });
+        checkboxes.on('ifChanged', function (event) {
+            if (checkboxes.filter(':checked').length == checkboxes.length) {
+                checkAll.prop('checked', 'checked');
+            } else {
+                checkAll.removeProp('checked');
+            }
+            checkAll.iCheck('update');
+        });
+        var checkGroup = $('input[name=chkGroup]');
+        checkGroup.each(function () {
+            var that = $(this);
+            var checkchild = that.parents('td').next().children('input.check');
+            that.on('ifChecked ifUnchecked', function (event) {
+                if (event.type == 'ifChecked') {
+                    checkchild.iCheck('check');
+                } else {
+                    checkchild.iCheck('uncheck');
+                }
+            });
+            checkchild.on('ifChanged', function (event) {
+                if (checkchild.filter(':checked').length == checkchild.length) {
+                    that.prop('checked', 'checked');
+                } else {
+                    that.removeProp('checked');
+                }
+                $(this).iCheck('update');
+            });
+        });
+        /*var checkchild = checkGroup.parents('td').next().children('input');
+         checkGroup.on('ifChecked ifUnchecked', function(event) {
+         if (event.type == 'ifChecked') {
+         checkchild.iCheck('check');
+         } else {
+         checkchild.iCheck('uncheck');
+         }
+         });
+         checkchild.on('ifChanged', function(event){
+         if(checkchild.filter(':checked').length == checkchild.length) {
+         checkGroup.prop('checked', 'checked');
+         } else {
+         checkGroup.removeProp('checked');
+         }
+         checkGroup.iCheck('update');
+         });*/
+
+    });
+
+</script>
+
+<script>
+    var form = $("#theFrom");
+    $('#btn').click(function () {
+        $.ajax({
+            url: "<{:url('role/rule_group_list')}>",
+            data: form.serialize(),
+            method: 'post',
+            dataType: 'json',
+            success: function (d) {
+                if (d.stat == '1') {
+                    swal({
+                        title: "太帅了",
+                        text: d.msg ? d.msg : '操作成功！',
+                        type: "success"
+                    }, function () {
+                        location.href = "<{:url('role/rule_group_menu',array('id'=>$group_data['id']))}>";
+                    });
+                } else {
+                    swal({
+                        title: "出错了",
+                        text: d.msg ? d.msg : '操作失败',
+                        type: "error"
+                    });
+                }
+            },
+            error: function (d) {
+                swal({
+                    title: "出错了",
+                    text: d.msg ? d.msg : '操作失败',
+                    type: "error"
+                });
+            }
+        });
+    });
+</script>
+
+
+<{include file="public/footer" /}>

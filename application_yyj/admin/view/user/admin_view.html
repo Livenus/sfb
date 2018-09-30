@@ -1,0 +1,185 @@
+<{include file="public/header"}>
+<link type="text/css" rel="stylesheet" href="/static/css/plugins/iCheck/custom.css">
+<link rel="stylesheet" type="text/css" href="/static/css/plugins/webuploader/webuploader.css">
+<link rel="stylesheet" type="text/css" href="/static/css/webuploader-demo.css">
+<script type="text/javascript" charset="utf-8" src="/static/js/plugins/iCheck/icheck.min.js"></script>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="tabs-container ibox-title">
+                <ul class="nav nav-tabs">
+                    <li><a class="icon iconfont icon-favor_light" href="<{:url('user/adminlist')}>" class="jf_sub_menu">管理员列表</a></li>
+                    <li class="active"><a href="javascript:;">新增/修改管理员</a></li>
+                </ul>
+                <div class="ibox-content">
+                    <div class="">
+                        <form class="form-horizontal" id="signupForm" onclick="return false">
+                            <input type="hidden" name="id" value="<{$item['adminid']}>">
+                            <div class="">
+                                <div class="form-group ">
+                                    <div class="col-sm-2 control-label">用户名</div>
+                                    <div class="col-sm-4">
+                                        <input id="username" type="text" class="form-control" value="<{$item['username']}>" name="username" readonly>
+                                        <span class="help-block m-b-none"></span>
+                                    </div>
+                                </div>  
+
+                                <div class="form-group ">
+                                    <div class="col-sm-2 control-label">密码</div>
+                                    <div class="col-sm-4">
+                                        <input id="password" type="password" class="form-control" value="" name="password">
+                                        <span class="help-block m-b-none"></span>
+                                    </div>
+                                </div> 
+                                <div class="form-group ">
+                                    <div class="col-sm-2 control-label">确认密码</div>
+                                    <div class="col-sm-4">
+                                        <input id="confirm_password" name="confirm_password" type="password" class="form-control" value="">
+                                        <span class="help-block m-b-none"></span>
+                                    </div>
+                                </div> 
+
+
+                                <div class="form-group class_photo" style="">
+                                    <label class="col-sm-2 control-label">真实姓名</label>
+                                    <div class="col-sm-4">
+                                        <input id="realname" type="text" class="form-control" value="<{$item['realname']}>" name="realname">
+                                        <span class="help-block m-b-none"></span>
+                                    </div>
+                                </div>
+                        <div class="form-group ">
+                            <div class="col-sm-2 control-label">头像</div>
+                            <div class="col-sm-4">
+                                <div class="input-group">
+                                    <input id="formitem_7" type="text" class="form-control" value="<{$item.photo}>" name="photo" readonly="">
+                                    <span class="input-group-btn"> <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal4" >上传
+                                            <span class="input-group-btn"></span></button>
+                                    </span>
+                                    <span class="input-group-btn"><button type="button" id="clearimg_formitem_7" class="btn btn-info"><i class="fa fa-eye"></i>清空</button></span>
+                                    <script>
+                                        $("#clearimg_formitem_7").click(function () {
+                                            var url = $('#formitem_7').val('');
+
+                                        });
+                                    </script>
+                                </div>
+                                <div class="input-group" style="margin-top:.5em;">
+                                    <img src="/uploads/<{$item.photo}>" class="img-responsive img-thumbnail" width="150" onerror="this.src='/static/image/nopic.jpg'" id="preimg">
+                                </div>
+                            </div>
+                        </div>
+                                <div class="form-group ">
+                                    <div class="col-sm-2 control-label">权限组</div>
+                                    <div class="col-sm-4">
+                                        <select id="ap_id" class="input_zdy input-sm" name="group_id">
+                                            <option value="0">权限组</option>
+                                            <{foreach name="group" item="v"}>
+                                            <option value="<{$v.id}>" <{if condition="$v['id']==$item['group_id']"}> selected<{/if}>><{$v.title}></option>
+                                            <{/foreach}>
+                                        </select>
+                                    </div>
+                                </div>  
+                                <div class="form-group ">
+                                    <div class="col-sm-2 control-label">允许登录</div>
+                                    <div class="col-sm-4">
+                                        <div class="checkbox i_checks"><label class=""><div class="iradio_square-green" style="position: relative;"><input type="radio" value="0" name="stat" style="position: absolute; opacity: 0;" <{if condition="$item.stat eq 0"}>checked<{/if}>></div>禁用 &nbsp;&nbsp;&nbsp;&nbsp;<div class="iradio_square-green" style="position: relative;"><input type="radio" value="1" name="stat" style="position: absolute; opacity: 0;" <{if condition="$item.stat eq 1"}>checked<{/if}>></div>启用 &nbsp;&nbsp;&nbsp;&nbsp;</label></div><script>;$('.i_checks').iCheck({checkboxClass: 'icheckbox_square-green', radioClass: 'iradio_square-green', });</script>
+                                        <span class="help-block m-b-none"></span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-4 col-sm-offset-2">
+                                        <a href="javascript:;" id="submit" class="btn btn-warning btnbottom">立即保存</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- jQuery Validation plugin javascript-->
+<div class="modal fade" id="myModal4" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+            <div class="modal-header">
+
+                <h4 class="modal-title" id="myModalLabel">您可以尝试文件拖拽或者点击添加图片按钮，来添加图片.</h4>
+            </div>
+            <div id="uploader">
+                <div class="queueList">
+                    <div id="dndArea" class="placeholder">
+                        <div id="filePicker"></div>
+                        <p>或将照片拖到这里，单次最多可选300张</p>
+                    </div>
+                </div>
+                <div class="statusBar" style="display:none;">
+                    <div class="progress">
+                        <span class="text">0%</span>
+                        <span class="percentage"></span>
+                    </div><div class="info"></div>
+                    <div class="btns">
+                        <div id="filePicker2"></div><div class="uploadBtn">开始上传</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div><!-- /.modal -->
+</div>
+<script src="/static/js/plugins/webuploader/webuploader.js"></script>
+<script src="/static/js/plugins/validate/jquery.validate.min.js"></script>
+<script src="/static/js/plugins/validate/messages_zh.min.js"></script>
+
+<script src="/static/js/form-validate.js"></script>
+<script>
+                                                                                $(function () {
+                                                                                    $("#submit").click(function () {
+                                                                                        var $form = $("#signupForm");
+                                                                                        $.ajax({
+                                                                                            url: "<{php}>echo url('user/edit')<{/php}>",
+                                                                                            data: $form.serialize(),
+                                                                                            type: 'post',
+                                                                                            dataType: 'json',
+                                                                                            success: function (d) {
+                                                                                                if (d.stat == '1') {
+                                                                                                    swal({
+                                                                                                        title: "太帅了",
+                                                                                                        text: d.msg ? d.msg : '操作成功！',
+                                                                                                        type: "success"
+                                                                                                    }, function () {
+                                                                                                        location.href = "<{:url('user/adminlist')}>";
+                                                                                                    });
+                                                                                                } else {
+                                                                                                    swal({
+                                                                                                        title: "出错了",
+                                                                                                        text: d.msg ? d.msg : '操作失败',
+                                                                                                        type: "error"
+                                                                                                    });
+                                                                                                }
+                                                                                            },
+                                                                                            error: function (d) {
+                                                                                                swal({
+                                                                                                    title: "出错了",
+                                                                                                    text: d.msg ? d.msg : '操作失败',
+                                                                                                    type: "error"
+                                                                                                });
+                                                                                            }
+                                                                                        });
+                                                                                    });
+                                                                                });
+ var i=1;                           
+$('#myModal4').on('shown.bs.modal', function (e) {
+    console.log(323);
+    if(i){
+ $.getScript("/static/js/webuploader-demo.js");  
+    }
+ 
+  i=0;
+})
+</script>
+<{include file="public/footer"}>

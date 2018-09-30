@@ -1,0 +1,184 @@
+<{include file="public/header" }>
+<link type="text/css" rel="stylesheet" href="/static/css/plugins/iCheck/custom.css">
+<script type="text/javascript" charset="utf-8" src="/static/js/plugins/iCheck/icheck.min.js"></script>
+    <script type="text/javascript" src="/static/ueditor/ueditor.config.js"></script>
+    <!-- 编辑器源码文件 -->
+    <script type="text/javascript" src="/static/ueditor/ueditor.all.js"></script>
+    <!-- 实例化编辑器 -->
+
+<style>
+    body{
+        background: #f3f1f3;
+    }
+</style>
+<div class="wrapper wrapper-content animated fadeInRight" title="新增/修改文章" fit=true>
+    <div style="ibox">
+        <div class="ibox-title">
+            股权详情
+        </div>
+        <div class="ibox-content">
+            <form method="post" class="form-horizontal" id="form1">
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">标题</label>
+                    <input type="hidden" class="form-control" name="id" value="<{$info.id}>">
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" name="title" value="<{$info.title}>">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">价格</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" name="price" value="<{$info.price}>">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">每人可购买份数</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" name="per_num" value="<{$info.per_num}>">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">赠送积分</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" name="red" value="<{$info.red}>">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">简介</label>
+                    <div class="col-sm-10">
+                        <textarea name="description" class="form-control input-lg m-b"><{$info.description}> </textarea>
+                    </div>
+                </div>
+                <div class="form-group" style="height:auto">
+                    <label class="col-sm-2 control-label">详情</label>
+                    <div class="col-sm-10" style="height:auto">
+                        <textarea name="content" class="" id="container1" style="min-height:200px"><{$info.content}> </textarea>
+                    </div>
+                </div>
+                <div class="hr-line-dashed"></div>
+                <div class="form-group ">
+                    <label class="col-sm-2 control-label">状态</label>
+                    <div class="col-sm-4">
+                        <div class="checkbox i_checks" style="display: inline-block;">
+                            <label class="">
+                                <div class="iradio_square-green" style="position: relative;">
+                                    <input type="radio" value="0" name="stat" style="position: absolute; opacity: 0;"  <{if condition="$info.stat neq 1"}> checked<{/if}>>
+                                           <ins class="iCheck-helper" style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; height: 100%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
+                                </div>禁用 &nbsp;&nbsp;&nbsp;&nbsp;
+                            </label>
+                        </div>
+                        <div class="checkbox i_checks" style="display: inline-block;">
+                            <label class="">
+                                <div class="iradio_square-green" style="position: relative;" >
+                                    <input type="radio" value="1" name="stat" style="position: absolute; opacity: 0;" <{$info.stat==1?'checked':''}>>
+                                           <ins class="iCheck-helper" style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; height: 100%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
+                                </div>启用 &nbsp;&nbsp;&nbsp;&nbsp;
+                            </label>
+                        </div>
+                        <script>
+                            ;
+                            $('.i_checks').iCheck({checkboxClass: 'icheckbox_square-green', radioClass: 'iradio_square-green', });
+                        </script>
+                        <span class="help-block m-b-none"></span>
+                    </div>
+                </div>
+
+                <div class="hr-line-dashed"></div>
+                <div class="hr-line-dashed"></div>
+                <div class="form-group">
+                    <div class="col-sm-4 col-sm-offset-2">
+                        <a class="btn btn-primary" type="bottun" id="submit">保存内容</a>
+                        <input class="btn btn-white" type="reset" value="取消"></input>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <link href="/static/css/plugins/summernote/summernote.css" rel="stylesheet">
+    <link href="/static/css/plugins/summernote/summernote-bs3.css" rel="stylesheet">
+    <!-- SUMMERNOTE -->
+    <script src="/static/js/plugins/summernote/summernote.min.js"></script>
+    <script src="/static/js/plugins/summernote/summernote-zh-CN.js"></script>
+    <script type="text/javascript">
+        var ue = UE.getEditor('container1');
+    </script>
+    <script>
+
+                                        function edit() {
+                                            $("#eg").addClass("no-padding");
+                                            $('.click2edit').summernote({
+                                                lang: 'zh-CN',
+                                                focus: true
+                                            });
+                                        }
+                                        ;
+                                        $(document).ready(function () {
+
+                                            $('.summernote').summernote({
+                                                lang: 'zh-CN'
+                                            });
+
+                                        });
+
+                                        var save = function () {
+                                            $("#eg").removeClass("no-padding");
+                                            var aHTML = $('.click2edit').code(); //save HTML If you need(aHTML: array).
+                                            $('.click2edit').destroy();
+                                        };
+
+    </script>
+    <script>
+        var add_url = "<{:url('product/add')}>";
+        var edit_url = "<{:url('product/edit')}>";
+        $("#submit").click(function (e) {
+            var type;
+            type = $("#type").val();
+            if (type == 1) {
+                $("#code").val('1');
+            }
+            var content;
+            content = $("#content").html();
+            $("#content1").val(content);
+            var $form = $("#form1");
+            if ($("[name='id']").val()) {
+
+                var url = edit_url;
+            } else {
+                var url = add_url;
+            }
+            $.ajax({
+                url: url,
+                data: $form.serialize(),
+                type: 'post',
+                dataType: 'json',
+                success: function (d) {
+                    if (d.stat == '1') {
+                        swal({
+                            title: "太帅了",
+                            text: d.msg ? d.msg : '操作成功！',
+                            type: "success"
+                        }, function () {
+                            location.href = "<{:url('product/index')}>";
+                        });
+                    } else {
+                        swal({
+                            title: "出错了",
+                            text: d.msg ? d.msg : '操作失败',
+                            type: "error"
+                        });
+                    }
+                },
+                error: function (d) {
+                    swal({
+                        title: "出错了",
+                        text: d.msg ? d.msg : '操作失败',
+                        type: "error"
+                    });
+                }
+            });
+        });
+
+    </script>
+
+
+    <{include file="public/footer" }>

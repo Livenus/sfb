@@ -1,0 +1,266 @@
+<{include file="public/header"}>
+<script type="text/javascript" charset="utf-8" src="/static/js/plugins/bootstrap-table/bootstrap-table.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="/static/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js"></script>
+<link rel="stylesheet" href="/static/css/plugins/bootstraptable/bootstrap-table.min.css">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="ibox float-e-margins">
+        <div class="ibox-title" style=" padding-bottom: 0;">
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="javascript:;"><{$info.site_name}>盈利统计</a></li>
+            </ul>
+        </div>
+        <div class="ibox-content">
+
+            <div class="row row-lg">
+                <div class="col-sm-12">
+                    <!-- Example Events -->
+                    <div class="example-wrap">
+                        <div class="example">
+                            <div class="hidden-xs" id="exampleTableEventsToolbar" role="group">
+                                <h3>流水统计：<span class="red" >&yen;<i id="all_money"><{$all_money}></i></span>元</h3>
+                                <h3>收益统计：<span class="red">&yen;<i id="all_money_make"><{$all_money_make}></i></span>元</h3>
+                                 <h3>利润统计：<span class="red">&yen;<i id="last"><{$last}></i></span>元</h3>
+                            </div>
+                            <!---search start-->
+                            <div class="right">
+                                <form id="search">
+                                <span style=" line-height: 30px; margin-right: 5px;">开始时间</span>
+                                 <input type="hidden"   class="input_zdy input-sm"  name="id" value="<{$id}>"/>
+                                <input type="text" id="start" value="" class="input_zdy input-sm" size=25 placeholder="开始时间" name="start"/>
+                                <input name="self_type" type="hidden" value="13">
+                                <span style=" line-height: 30px; margin-right: 5px;">结束时间</span>
+                                <input type="text" id="end" value="" class="input_zdy input-sm" size=25 placeholder="结束时间" name="end"/>
+                                <span style=" line-height: 30px; margin-right: 5px;">用户手机号:</span>
+                                <input type="text" id="phone" value="" class="input_zdy input-sm" size=15 placeholder="手机号" name="phone"/>
+                                <span style=" line-height: 30px; margin-right: 5px;">订单编号:</span>
+                                <input type="text" id="a_name" value="" class="input_zdy input-sm" size=15 placeholder="订单号" name="a_name"/>
+                                <select name="type">
+                                    <option value="0">全部</option>
+                                    <option value="1">刷卡</option>
+                                    <option value="2">升级</option>
+                                </select>
+                                <a href="javascript:;" id="btnsearch" class="btn btn-primary btn-sm">查询</a>
+                                <a href="javascript:;" id="btnexcel" class="btn btn-primary btn-sm">导出excel</a>
+                                </form>
+                            </div>
+                            <!---search end---->
+                            <table id="dg" data-mobile-responsive="true">
+                            </table>
+                        </div>
+                    </div>
+                    <!-- End Example Events -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/static/js/plugins/layer/laydate/laydate.js"></script>
+<script>
+    var url_index="<{:url('part/get_demain_order')}>";
+    var update_edit = "<{:url('order/edit')}>";
+    var url_del = "<{:url('order/del')}>";
+    $("#btnsearch").click(function () {
+        q = getQueryParams();
+        var url=url_index;
+        $("#dg").bootstrapTable('refresh', {url: url, query: q});
+    })
+    $("#btnexcel").click(function () {
+        q = getQueryParams();
+        q.excel=1;
+        var url=url_index;
+        var par=$.param(q);
+        console.log(url_index+"?"+par);
+        window.open(url_index+"?"+par);
+    })
+    function getQueryParams() {
+        var q = {};
+var params = $("#search").serializeArray();
+for (var item in params) {
+   q[params[item].name] = params[item].value;
+}
+        return q;
+    }
+
+    $(function () {
+      $('#dg').bootstrapTable({
+            url:url_index,
+            //method:'post',
+            queryParams: function (params) {
+                params.p = parseInt(params.offset / params.limit) + 1;
+                params = $.extend(params, getQueryParams());
+                return params;
+            },
+            queryParamsType: "limit",
+            contentType: 'application/json',
+            dataType: 'json',
+            sidePagination: "server", //表示服务端请求
+            pagination: true, //启动分页
+            pageNumber: 1, //当前第几页
+            pageSize: 10, //每页显示的记录数
+            pageList: [10, 15, 20], //记录数可选列表
+            dataField: 'rows',
+            idField: "id",
+            columns: [{checkbox: true, align: 'center', valign: 'middle'},
+                {title: 'id', field: 'id', align: 'center', valign: 'middle'},
+                {title: '姓名', field: 'truename', align: 'center', valign: 'middle'},
+                {title: '手机号', field: 'phone', align: 'center', valign: 'middle'},
+                {title: '<span title="刷卡金额 – (刷卡的金额 * 会员刷卡费率 + 代扣固定费)">实际到账(元)</span>', field: 'last_money', align: 'center', valign: 'middle',formatter: function (value, row, index) {
+                        var html = '';
+                        if(row.type==1){
+                            //row.amount+"-("+row.amount+"*"+row.rate+"‰+"+row.rate_money+")="+
+                          html="<span title='"+row.amount+"-("+row.amount+"*"+row.rate+"‰+"+row.rate_money+")'"+">"+row.last_money+"</span>" 
+                        }else{
+                            html="--";
+                        }
+                          
+                        return html; 
+                        
+                        
+                }},
+                {title: '银行代扣费率（‰）', field: 'low_rate', align: 'center', valign: 'middle'},
+                {title: '客户代扣费率（‰）', field: 'rate', align: 'center', valign: 'middle'},
+                {title: '用户', field: 'uname', align: 'center', valign: 'middle'},
+                {title: '第三方订单号', field: 'outer_sn', align: 'center', valign: 'middle',formatter: function (value, row, index) {
+                        var html = '';
+                         html="<a href='javascript:;' title='"+row.sn+"'>"+row.outer_sn+"</a>";
+                        return html; 
+                        
+                        
+                }},
+                {title: '消费金额(元)', field: 'amount', align: 'center', valign: 'middle'},
+                {title: '<span title="【刷卡金额 – (刷卡金额 * 接口刷卡费率 +代扣固定费)】-实际到账 ">总收益(元)</span>', field: 'rate_real', align: 'center', valign: 'middle',formatter: function (value, row, index) {
+                        var html = '';
+                        //
+                         html="<span title='"+row.amount+"-("+row.amount+"*"+row.low_rate+"‰+"+row.low_rate_money+")-"+row.last_money+"="+"'>"+row.rate_real+"</span>";
+                        return html; 
+                        
+                        
+                }},
+                {title: '<span title="【总收益 - 返拥】">实际利润(元)</span>', field: 'last', align: 'center', valign: 'middle'},
+                {title: '类别', field: 'type', align: 'center', valign: 'middle', formatter: function (value, row, index) {
+                        var html = '';
+                        if(row.type==1){
+                            html="刷卡";
+                        }else{
+                            html="升级";     
+                        }
+                        return html;
+                        
+                }},
+                {title: '交易时间', field: 'add_time', align: 'center', valign: 'middle'},
+              ],
+            responseHandler: function (res) {
+               $("#all_money").text(res.all_money);
+               $("#all_money_make").text(res.all_money_make);
+               $("#last").text(res.last);
+                return res;
+            },
+            search: false,
+            iconSize: 'outline',
+            toolbar: '#exampleTableEventsToolbar',
+            icons: {
+                refresh: 'glyphicon-repeat',
+                toggle: 'glyphicon-list-alt',
+                columns: 'glyphicon-list'
+            },
+            toolbarAlign: 'left',
+            showToggle: false,
+            showColumns: false, //显示下拉框勾选要显示的列
+            // minimumCountColumns:3,
+            showRefresh:true,//显示刷新按钮
+            striped: true, //表格显示条纹
+            singleSelect: false, //复选框只能选择一条记录  
+            clickToSelect: false, //点击行即可选中单选/复选框  
+            checkboxHeader: true,
+            showHeader:true
+        });
+    $("body").on("click",".detail",function(e){
+        e.preventDefault();
+                 var id=$(this).attr("data-id");
+        location.href=update_edit+"?id="+id+"&disable=1";
+    }) 
+    $("body").on("click",".action_del",function(e){
+        e.preventDefault();
+         var id=$(this).attr("data-id");
+         confirm_dialog("提示","删除当前订单",function(){
+             var url=url_del;
+             var data={id:id};          
+             update_post(url,data,function(){
+                 
+                  $("#dg").bootstrapTable('refresh');
+                 alert_m("删除成功");
+             });
+         })
+    }) 
+    $("body").on("click","#btndel",function(e){
+        e.preventDefault();
+         var items=$('#dg').bootstrapTable('getSelections');
+        items = objcolum(items, 'id');
+         confirm_dialog("提示","删除当前订单",function(){
+             var url=url_del;
+             var data={id:items};          
+             update_post(url,data,function(){
+                 
+                  $("#dg").bootstrapTable('refresh');
+                 alert_m("删除成功");
+             });
+         })
+    }) 
+    var start = {
+        elem: "#start",
+        format: "YYYY-MM-DD hh:mm:ss",
+        min: "2016-06-16 23:59:59",
+        max: "2099-06-16 23:59:59",
+        istime: true,
+        istoday: false,
+        choose: function (datas) {
+            end.min = datas;
+            end.start = datas
+        }
+    };
+    var end = {
+        elem: "#end",
+        format: "YYYY-MM-DD hh:mm:ss",
+        min: laydate.now(),
+        max: "2099-06-16 23:59:59",
+        istime: true,
+        istoday: false,
+        choose: function (datas) {
+            start.max = datas
+        }
+    };
+    laydate(start);
+    laydate(end);
+    });
+function alert_m(msg){
+                            swal("提示信息", msg, "success");   
+}
+   function update_post(url,data,msg){
+       $.post(url,data,function(data){
+           
+           if(data.stat==1){
+               msg();
+           }else{
+               alert(data.msg);
+           }
+       })
+   } 
+   function confirm_dialog(title,dec,action){
+ swal({
+        title: title,
+        text: dec,
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        cancelButtonText:"取消",
+        confirmButtonText: "确认",
+        closeOnConfirm: false
+    }, function (isConfirm) {
+        if(isConfirm){
+        action();    
+        }
+    });
+       
+   }
+</script>
+<{include file="public/footer"}>

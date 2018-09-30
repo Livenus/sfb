@@ -1,0 +1,78 @@
+{include file="public/header" /}
+
+<body>
+
+
+
+	<div class="easyui-panel" title="新增/修改管理员" fit=true>
+		<div style="padding:10px 60px 20px 60px">
+	    <form id="ff" method="post">
+	    	<input type="hidden" name="ajax" value='1'>
+	    	<input type="hidden" name="id" value='{$item['adminid']}'>
+	    	<table cellpadding="5">
+	    		<tr>
+	    			<td>用户名:</td>
+	    			<td><input class="easyui-textbox" type="text" style="width:250px" name="username" value="{$item['username']}" data-options="required:true"></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>真实姓名:</td>
+	    			<td><input class="easyui-textbox" type="text" style="width:250px" name="realname" value="{$item['realname']}" data-options="required:true"></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>密码:</td>
+	    			<td><input class="easyui-textbox" type="text" style="width:250px" name="password" value=""></input></td>
+	    		</tr>
+	    		<tr>
+	    			<td>允许登录:</td>
+	    			<td>
+	    			<span class="radioSpan">
+						<input class="easyui-validatebox" type="radio" name="stat" data-options="required:true" {if condition="$item['stat']!='1'"} checked {/if} value="0">否</input>
+						<input class="easyui-validatebox" type="radio" name="stat" data-options="required:true" {if condition="$item['stat']=='1'"} checked {/if} value="1">是</input>
+	    			</span>
+	    			</td>
+	    		</tr>
+
+	    		<tr>
+	    			<td>权限组:</td>
+	    			<td>
+	    				<select name="group_id" class="easyui-combobox"  style="width:250px" >
+							<option value="0"  {if condition="$item['group_id'] == 0"}selected{/if}>权限组</option>
+							{foreach name="group" item="v"}
+							<option value="{$v.id}" {if condition="$v['id']==$item['group_id']"} selected{/if}>{$v.title}</option>
+							{/foreach}
+	    				</select>
+	    			</td>
+	    		</tr>
+	    	</table>
+	    </form>
+	    <div>
+	    	<a href="javascript:void(0)" class="easyui-linkbutton btn-danger-byh" style="margin-left:70px !important;" onclick="submitForm()">提交</a>
+
+	    </div>
+	    </div>
+	</div>
+	<script>
+		
+		function submitForm(){
+			var form = $("#ff");
+			$.ajax({
+				url:"{:url('user/edit')}",
+				data:form.serialize(),
+				method:'post',
+				dataType:'json',
+				success:function(d){
+					if(d.stat == '1'){
+						$.messager.alert('提示', d.msg?d.msg:'操作成功', 'success');
+						location.href="{:url('user/adminlist')}";
+					}else{
+						$.messager.alert('提示', d.msg?d.msg:'操作失败', 'error');
+					}
+				}
+					
+			});
+		}
+	</script>
+</body>
+
+
+{include file="public/footer" /} 

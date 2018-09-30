@@ -1,0 +1,156 @@
+<div class="tabs-container">
+
+		<div class="tab-content">
+			<div class="tab-pane active">
+				<div class="ibox float-e-margins content-add_save">
+					<div class="ibox-title">
+						<h5>栏目</h5>
+					</div>
+					<div class="ibox-content">
+                        <!--头部快捷btn-->
+                        <div class="btn-group"><a href="<?php echo cmsadmin_url('cat','add',array('type'=>0)) ?>" type="button" class="btn btn-sm btn-primary"><i class="fa fa-plus"></i> 添加主栏目</a></div>
+                        <div class="btn-group"><a href="<?php echo cmsadmin_url('cat','add',array('type'=>1)) ?>" type="button" class="btn btn-sm btn-primary"><i class="fa fa-file-word-o"></i> 添加单网页</a></div>
+                        <div class="btn-group"><a href="<?php echo cmsadmin_url('cat','add',array('type'=>2)) ?>" type="button" class="btn btn-sm btn-primary">添加外部外链</a></div>
+                        <div class="btn-group"><a href="javascript:jf.reload();" type="button" class="btn btn-sm btn-white jf_refresh"><i class="fa fa-refresh"></i> 刷新</a></div>
+                        <div class="btn-group"><a href="javascript:saveOrder()" type="button" class="btn btn-sm btn-white"><i class="fa fa-arrows-v"></i> 排序</a></div>
+                        <!--头部快捷btn end-->
+                        <div class="dd" id="netstable_head">
+                            <ol class="dd-list"></ol>
+                        </div>
+                        <div class="dd" id="nestable2">
+                            <ol class="dd-list"></ol>
+                        </div>
+                        <div class="btnbar-placeholder"></div>
+                        <div class="abs_save center">
+                            <button type="button" onclick="saveOrder()" class="btn btn-warning btnbottom" style=" margin-bottom: 15px;">保存排序</button>
+                        </div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+</div>
+<script src="/static/components/hp/js/plugins/nestable/jquery.nestable.js"></script>
+<script>
+var jq = $ = $.noConflict();
+var data = (<?php echo (!empty($tree) && is_array($tree))?json_encode($tree):''?>); //树形数据
+var needSave = false;  //是否需要保存？更改排序后要保存
+
+var cstat = function(int){
+	if(int == 0) return '不可用';
+	if(int == 1) return '可用';
+	if(int == 2) return '显示到首页';
+	return '未知';
+}
+
+//渲染树形结构
+var render = function(data){
+	var dom = jq("#nestable2 .dd-list");
+	var header = '' + 
+		'<ol class="dd-list">' +
+		  	'<li class="dd-item item-title">'+
+		  		'<div class="title-handle">栏目名称</div>'+
+    			'<div class="handle_right">'+
+      				'<div class="handle_right_btn">操作</div>'+
+      				'<div class="handle_right_title"><span>栏目类型</span><span></span></div>'+
+      				'<div class="handle_right_title"><span>状态</span></div>'
+    			'</div>'+
+  			'</li>'+
+		'</ol>';
+		jq("#netstable_head").html(header);
+	var handler = function(d){
+		var html = '';
+		jq.each(d,function(k,v){
+			html += ''+
+					'<li class="dd-item" data-id="'+v.id+'">'+
+//						'<div class="row">'+
+                    	'<div class="dd-handle">' +
+                    		'<span class="label-infoy"><i class="fa fa-users"></i></span>' + v.name +
+                		'</div>'+
+                		'<div class="handle_right">'+ 
+						'<div class="handle_right_btn"> <a onclick="edit('+v.id+')" href="javascript:;" class="btn btn-warning btn-sm"><i class="fa fa-edit"></i> 修改</a><a onclick="del('+v.id+')" href="javascript:;" class="btn btn-warning btn-sm"><i class="fa fa-trash-o"></i> 删除</a><a target="_blank" href="<?php O(cms_url('content','cat',array('siteid'=>cmsadmin_getOPSite('id'))))?>&catid='+v.id+'" class="btn btn-warning btn-sm"><i class="fa fa-tv"></i> 前台</a></div>'+
+                			'<div class="handle_right_title">' +
+	                			'<span>' + parseType(v.type) + '</span>' +
+		                		'<span>'+((v.modelname)?v.modelname:'') + '</span>' +
+                			'</div>' +
+                			'<div class="handle_right_title"><span>'+(cstat(v.stat))+'</span></div>'+
+                		'</div>'+
+///                		'</div>'+
+                		(!!v.son ? ('<ol>' + handler(v.son) + '</ol>') : '') +
+					'</li>';
+		});
+		return html;
+	}	
+	if(jq.isArray(data)){
+		var html = handler(data);
+		dom.html(html);
+	}else{
+		return false;
+	}
+
+}
+
+var parseType = function(type){
+	if(type == 1){
+		return '单网页';
+	}else if(type == 0){
+		return '栏目';
+	}else if(type == 2){
+		return '外链';
+	}
+	return '未知';
+}
+render(data);
+//保存排序
+var saveOrder = function(){
+	if(!window.JSON){
+		swalErrorMsg('浏览器不支持');return;
+	}
+	if(needSave === true){
+		jq.ajax({
+			url:'<?php echo url('admin','module','cms',array('m_ct'=>'cat','m_at'=>'changeorder'))?>',
+			type:'post',
+			dataType:'json',
+			data:{data:JSON.stringify(data)},
+			success:function(d){
+				if(d.stat == '1'){
+					jf.suc(d);
+					needSave = false;
+				}else{
+					jf.err(d);
+				}
+			}
+			
+		});
+	}else{
+		swalErrorMsg('排序位置没有变化。拖动位置后再来排序吧');
+	}
+}
+
+
+var updateOutput = function (e) {
+    var list = e.length ? e : jq(e.target);
+
+    data = list.nestable('serialize');
+    needSave = true;
+
+};
+// activate Nestable for list 2
+jq('#nestable2').nestable({
+    group: 1
+}).on('change', updateOutput);
+
+function edit(id){
+	var url = "<?php echo url('admin','module','cms',array('m_ct'=>'cat','m_at'=>'edit')) ?>";
+	location.href = url + '&id=' + id;
+}
+
+
+function del(ids){
+	if(!$.isArray(ids)){
+		ids = [ids];
+	}
+	jf.delMsg({ids:ids,url:jf.urlQueryStr("<?php O(cmsadmin_url('cat','del')) ?>",'id','#ID#')},"<?php O(cmsadmin_url('cat','list')) ?>");
+}
+
+</script>

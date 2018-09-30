@@ -1,0 +1,40 @@
+<{include file="public/header" }>
+    <link type="text/css" rel="stylesheet" href="/static/css/plugins/iCheck/custom.css">
+	<link rel="stylesheet" type="text/css" href="/static/css/plugins/webuploader/webuploader.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/webuploader-demo.css">
+    <!--日期-->
+    <!-- layerDate plugin javascript -->
+<script src="/static/js/plugins/layer/laydate/laydate.js"></script>
+    <style>
+    	 body {
+        background: #f3f3f4;
+    }
+    </style>
+    <script type="text/javascript" charset="utf-8" src="/static/js/plugins/iCheck/icheck.min.js"></script>
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="tabs-container ibox-title">
+                    <ul class="nav nav-tabs ">
+                            <li class="active"><a href="javascript:;">计划详情</a></li>
+                    </ul>
+                    <div class="ibox-content">
+                        <div class="">
+                            <form class="form-horizontal" id="form1" onclick="return false">
+                               <div class="panel-heading">
+                                </div> 
+                                <div class="">
+                                    <table class="table">
+                                        <tr><td>用户ID:<{$info.member_id}></td><td>用户名:<{$info.member.uname}></td><td></td></tr>
+                                         <tr><td>银行：<{$info.credit.bank_name}></td><td>卡号：<{$info.credit.bank_card}></td><td></td></tr>
+                                         <tr><td>类型：<{$info.type==1?'消费':'还款'}></td><td>金额：<{$info.amount}></td><td></td></tr>
+                                    </table>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <{include file="public/footer" }>

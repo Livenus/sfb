@@ -1,0 +1,314 @@
+<{include file="public/header"}>
+<link rel="stylesheet" type="text/css" href="/static/css/plugins/webuploader/webuploader.css">
+<link rel="stylesheet" type="text/css" href="/static/css/webuploader-demo.css">
+    <style>
+    	 body {
+        background: #f3f3f4;
+    }
+    .col-sm-4 .form-control{
+        
+        width:90%;
+    }
+    .col-sm-4 .form-control,.help-block{
+        
+        display:inline-block;
+    }
+    </style>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="tab-content">
+        <div class="tab-pane active wrapper wrapper-content ">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>
+                        <{switch name="action" }>
+                        <{case value="gadd" }>添加会员组<{/case}>
+                        <{case value="gedit" }>修改会员组<{/case}>
+                        <{/switch}>
+                    </h5>
+
+                </div>
+                <div class="ibox-content">
+
+
+                    <div class="row">
+                        <form id="form1" method="post" action="" class="form-horizontal" novalidate="novalidate">
+                            <input type="hidden" name='id' value='<{$info.id}>'>
+                            <div class="form-group ">
+                                <div class="col-sm-2 control-label">会员组名称</div>
+                                <div class="col-sm-4">
+                                    <input id="formitem_1" type="text" class="form-control" value="<{$info.name}>" name="name">
+                                    <span class="help-block m-b-none"></span>
+                                </div>
+                            </div>      
+                            <div class="form-group ">
+                                <div class="col-sm-2 control-label">会员描述</div>
+                                <div class="col-sm-4">
+                                    <textarea id="formitem_1" type="text" class="form-control"  name="content"><{$info.content}></textarea>
+                                    <span class="help-block m-b-none"></span>
+                                </div>
+                            </div> 
+                            <div class="form-group ">
+                                <div class="col-sm-2 control-label">金额（升级条件）</div>
+                                <div class="col-sm-4">
+                                    <input id="formitem_1" type="number" class="form-control" value="<{$info.money}>" name="money">
+                                     <span class="help-block m-b-none">元</span>
+                                </div>
+                            </div> 
+                            <div class="form-group ">
+                                <div class="col-sm-2 control-label">推荐人数（升级条件）</div>
+                                <div class="col-sm-4">
+                                    <input id="formitem_1" type="number" class="form-control" value="<{$info.intr_num}>" name="intr_num">
+                                    <span class="help-block m-b-none"></span>
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <div class="col-sm-2 control-label">无积分费率</div>
+                                <div class="col-sm-4">
+                                    <input id="formitem_1" type="number" class="form-control" value="<{$info.rate_1}>" name="rate_1">
+                                     <span class="help-block m-b-none">‰</span>
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <div class="col-sm-2 control-label">有积分费率</div>
+                                <div class="col-sm-4">
+                                    <input id="formitem_1" type="number" class="form-control" value="<{$info.rate_2}>" name="rate_2">
+                                     <span class="help-block m-b-none">‰</span>
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <div class="col-sm-2 control-label">同名费率</div>
+                                <div class="col-sm-4">
+                                    <input id="formitem_1" type="number" class="form-control" value="<{$info.rate_3}>" name="rate_3">
+                                     <span class="help-block m-b-none">‰</span>
+                                </div>
+                             </div>
+                            <div class="form-group ">
+                                <div class="col-sm-2 control-label">银联通道(带积分)费率</div>
+                                <div class="col-sm-4">
+                                    <input id="formitem_1" type="number" class="form-control" value="<{$info.rate_4}>" name="rate_4">
+                                     <span class="help-block m-b-none">‰</span>
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <div class="col-sm-2 control-label">银联通道(标扣)费率</div>
+                                <div class="col-sm-4">
+                                    <input id="formitem_1" type="number" class="form-control" value="<{$info.rate_5}>" name="rate_5">
+                                     <span class="help-block m-b-none">‰</span>
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <div class="col-sm-2 control-label">银联通道(新无卡)费率</div>
+                                <div class="col-sm-4">
+                                    <input id="formitem_1" type="number" class="form-control" value="<{$info.rate_6}>" name="rate_6">
+                                     <span class="help-block m-b-none">‰</span>
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <div class="col-sm-2 control-label">银联通道众商费率</div>
+                                <div class="col-sm-4">
+                                    <input id="formitem_1" type="number" class="form-control" value="<{$info.rate_7}>" name="rate_7">
+                                     <span class="help-block m-b-none">‰</span>
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <div class="col-sm-2 control-label">银联通道同付费率</div>
+                                <div class="col-sm-4">
+                                    <input id="formitem_1" type="number" class="form-control" value="<{$info.rate_8}>" name="rate_8">
+                                     <span class="help-block m-b-none">‰</span>
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <div class="col-sm-2 control-label">无积分固定费用</div>
+                                <div class="col-sm-4">
+                                    <input id="formitem_1" type="number" class="form-control" value="<{$info.rate_1_money}>" name="rate_1_money">
+                                     <span class="help-block m-b-none">元</span>
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <div class="col-sm-2 control-label">有积分固定费用</div>
+                                <div class="col-sm-4">
+                                    <input id="formitem_1" type="number" class="form-control" value="<{$info.rate_2_money}>" name="rate_2_money">
+                                     <span class="help-block m-b-none">元</span>
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <div class="col-sm-2 control-label">同名固定费用</div>
+                                <div class="col-sm-4">
+                                    <input id="formitem_1" type="number" class="form-control" value="<{$info.rate_3_money}>" name="rate_3_money">
+                                     <span class="help-block m-b-none">元</span>
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <div class="col-sm-2 control-label">银联通道(带积分)固定费用</div>
+                                <div class="col-sm-4">
+                                    <input id="formitem_1" type="number" class="form-control" value="<{$info.rate_4_money}>" name="rate_4_money">
+                                     <span class="help-block m-b-none">元</span>
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <div class="col-sm-2 control-label">银联通道(标扣)固定费用</div>
+                                <div class="col-sm-4">
+                                    <input id="formitem_1" type="number" class="form-control" value="<{$info.rate_5_money}>" name="rate_5_money">
+                                     <span class="help-block m-b-none">元</span>
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <div class="col-sm-2 control-label">银联通道(新无卡)固定费用</div>
+                                <div class="col-sm-4">
+                                    <input id="formitem_1" type="number" class="form-control" value="<{$info.rate_6_money}>" name="rate_6_money">
+                                     <span class="help-block m-b-none">元</span>
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <div class="col-sm-2 control-label">银联通道众商固定费用</div>
+                                <div class="col-sm-4">
+                                    <input id="formitem_1" type="number" class="form-control" value="<{$info.rate_7_money}>" name="rate_7_money">
+                                     <span class="help-block m-b-none">元</span>
+                                </div>
+                            </div>
+                                   <div class="form-group ">
+                                <div class="col-sm-2 control-label">银联通道同付固定费用</div>
+                                <div class="col-sm-4">
+                                    <input id="formitem_1" type="number" class="form-control" value="<{$info.rate_8_money}>" name="rate_8_money">
+                                     <span class="help-block m-b-none">元</span>
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <div class="col-sm-2 control-label">上1级获利比例</div>
+                                <div class="col-sm-4">
+                                    <input id="formitem_1" type="number" class="form-control" value="<{$info.level_1_rate}>" name="level_1_rate">
+                                    <span class="help-block m-b-none">%</span>
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <div class="col-sm-2 control-label">上2级获利比例</div>
+                                <div class="col-sm-4">
+                                    <input id="formitem_1" type="number" class="form-control" value="<{$info.level_2_rate}>" name="level_2_rate">
+                                    <span class="help-block m-b-none">%</span>
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <div class="col-sm-2 control-label">上3级获利比例</div>
+                                <div class="col-sm-4">
+                                    <input id="formitem_1" type="number" class="form-control" value="<{$info.level_3_rate}>" name="level_3_rate">
+                                    <span class="help-block m-b-none">%</span>
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <div class="col-sm-2 control-label">图片</div>
+                                <div class="col-sm-4">
+                                    <div class="input-group">
+                                        <input id="formitem_7" type="text" class="form-control" value="<{$info.photo}>" name="photo" readonly="">
+                                        <span class="input-group-btn"> 
+                                            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal4" >上传
+                                                <span class="input-group-btn"></span></button>
+                                        </span>
+                                        <span class="input-group-btn"><button type="button" id="clearimg_formitem_7" class="btn btn-info"><i class="fa fa-eye"></i>清空</button></span>
+                                        <script>
+                                            $("#clearimg_formitem_7").click(function () {
+                                                var url = $('#formitem_7').val('');
+
+                                            });
+                                        </script>
+                                    </div>
+                                    <div class="input-group" style="margin-top:.5em;">
+                                        <img src="/uploads/<{$info.photo}>" class="img-responsive img-thumbnail" width="150" onerror="this.src='/static/image/nopic.jpg'" id="preimg">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group ">
+                                <div class="col-sm-2 control-label">备注</div>
+                                <div class="col-sm-4">
+                                    <textarea id="formitem_2" class="form-control" rows="3" name="mark"></textarea>
+
+                                    <span class="help-block m-b-none"></span>
+                                </div>
+                            </div>                              						
+                            <div class="form-group">
+                                <div class="col-sm-4 col-sm-offset-2">
+                                    <a class="btn btn-warning btnbottom" type="submit" id="submit">保存内容</a>
+                                </div>
+                            </div>	
+                        </form>
+
+                    </div>
+                    <div class="modal fade" id="myModal4" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h4 class="modal-title" id="myModalLabel">您可以尝试文件拖拽或者点击添加图片按钮，来添加图片.</h4>
+                                </div>
+                                <div id="uploader">
+                                    <div class="queueList">
+                                        <div id="dndArea" class="placeholder">
+                                            <div id="filePicker"></div>
+                                            <p>或将照片拖到这里，单次最多可选300张</p>
+                                        </div>
+                                    </div>
+                                    <div class="statusBar" style="display:none;">
+                                        <div class="progress">
+                                            <span class="text">0%</span>
+                                            <span class="percentage"></span>
+                                        </div><div class="info"></div>
+                                        <div class="btns">
+                                            <div id="filePicker2"></div><div class="uploadBtn">开始上传</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <script src="/static/js/plugins/webuploader/webuploader.js"></script>
+                    <script src="/static/js/webuploader-demo.js"></script>
+                    <script>
+                                                                                                var $ = jq = $.noConflict();
+
+                    //提交
+                                                                                                $("#submit").click(function () {
+                                                                                                    var $form = $("#form1");
+                                                                                                    $.ajax({
+                                                                                                        url: "<{php}>echo url('membergroup/'.$action)<{/php}>",
+                                                                                                        data: $form.serialize(),
+                                                                                                        type: 'post',
+                                                                                                        dataType: 'json',
+                                                                                                        success: function (d) {
+                                                                                                            if (d.stat == '1') {
+                                                                                                                swal({
+                                                                                                                    title: "太帅了",
+                                                                                                                    text: d.msg,
+                                                                                                                    type: "success"
+                                                                                                                }, function () {
+                                                                                                                    location.href = "<{:url('membergroup/grouplist')}>";
+                                                                                                                });
+                                                                                                            } else {
+                                                                                                                swal({
+                                                                                                                    title: "出错了",
+                                                                                                                    text: d.msg,
+                                                                                                                    type: "error"
+                                                                                                                });
+                                                                                                            }
+                                                                                                        }
+                                                                                                    });
+                                                                                                });
+ var i=1;                           
+$('#myModal4').on('shown.bs.modal', function (e) {
+    console.log(323);
+    if(i){
+ $.getScript("/static/js/webuploader-demo.js");  
+    }
+ 
+  i=0;
+}) 
+                    </script>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<{include file="public/footer"}>

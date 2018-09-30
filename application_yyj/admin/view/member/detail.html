@@ -1,0 +1,47 @@
+<{include file="public/header"}>
+<link type="text/css" rel="stylesheet" href="/static/css/plugins/iCheck/custom.css">
+<script type="text/javascript" charset="utf-8" src="/static/js/plugins/iCheck/icheck.min.js"></script>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="tabs-container ibox-title">
+                <ul class="nav nav-tabs">
+                    <{if condition="$action eq 'index'"}>
+                    <li class="active"><a href="javascript:;">会员列表</a></li>
+                    <li ><a class="icon iconfont icon-favor_light" href="<{:url('member/add')}>" class="jf_sub_menu">新增/修改会员</a></li>
+                    <{else}>
+                    <li><a class="icon iconfont icon-favor_light" href="<{:url('member/index')}>" class="jf_sub_menu">会员列表</a></li>
+                    <li class="active"><a href="javascript:;">会员详情</a></li>
+                    <{/if}>
+                </ul>
+                <div class="ibox-content">
+                    <div class="">
+                        <div class="">会员详情</div>
+                        <table class="table">
+                            <tr><td>登录名</td><td>昵称：<{$data.nick_name}></td><td>可提现金额：<{$data.money}></td></tr>
+                            <tr><td><a href="<{:url('order/index',array('uname'=>$data[uname]))}>">刷卡消费金额总额:<{$data.sk_total}></a></td><td><a href="<{:url('member_monylog/index',array('type'=>1,'get_user'=>$data[uname]))}>">下级刷卡返佣 ：<{$data.xj_sk_fy_total}></a></td><td><a href="<{:url('member_monylog/index',array('type'=>2,'get_user'=>$data[uname]))}>">升级返佣：<{$data.xj_up_fy_total}></a></td></tr>
+                            <tr><td>会员状态:<{$data.stat}></td><td>等级 ：<{$data.group.name}></td><td>费率：<{$data.group.rate_1}></td></tr>
+                            <tr><td>注册时间：:<{$data.add_time}></td><td>提现记录 ：<a href="<{:url('member_monylog/cash',array('get_user'=>$data[uname]))}>">提现记录</a></td><td></td></tr>                       
+                        </table>
+                        <div class="">会员身份信息</div>
+                        <table class="table">
+                            <tr><td>名称：<{$data.truename}></td><td>银行卡号：<{$data.banknum}></td><td>银行名称：<{$data.bankname}></td></tr>
+                            <tr><td>开户银行：<{$data.bank.detail}></td><td>省 ：<{$data.bank.province}></td><td>市：<{$data.bank.city}></td></tr>
+                            <tr><td>身份证号：<{$data.idnum}></td><td>照片审核<a href="<{:url('member/edit',array('disable'=>1,'uid'=>$data[id]))}>">照片审核</a></td><td></td></tr>
+                         </table>
+                        <div class="">下级会员</div>
+                        <table class="table">
+                            <tr><td>名称</td><td>手机号</td><td>昵称</td><td>会员等级</td><td>注册时间</td><td>操作</td></tr>
+                            <{volist name="data.child" id="v"}>
+                            <tr><td><{$v.uname}></td><td><{$v.phone}></td><td><{$v.nickname}></td><td><{$v.group.name}></td><td><{$v.add_time}></td><td><a href="<{:url('member/detail',array('id'=>$v['id']))}>">查看</a></td></tr>
+                            <{/volist}>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+</script>
+<{include file="public/footer"}>

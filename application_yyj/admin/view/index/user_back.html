@@ -1,0 +1,155 @@
+<{include file="public/header"}>
+       <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/echarts.min.js"></script>
+<body>
+
+            
+            
+<div class="wrapper wrapper-content animated fadeInRight">
+            <div class="row row-lg">
+                <div class="col-sm-12">
+                    <!-- Example Events -->
+                    <div class="example-wrap">
+                        <div class="example">
+                            <div class="hidden-xs" id="exampleTableEventsToolbar" role="group">
+                               
+                            </div>
+                            <!---search start-->
+                            <div class="right">
+                                <form id="search">
+                                <span style=" line-height: 30px; margin-right: 5px;">开始时间</span>
+                                <input type="text" id="start" value="<{$start}>" class="input_zdy input-sm" size=25 placeholder="开始时间" name="start"/>
+                                <span style=" line-height: 30px; margin-right: 5px;">结束时间</span>
+                                <input type="text" id="end" value="<{$end}>" class="input_zdy input-sm" size=25 placeholder="结束时间" name="end"/>
+                                <a href="javascript:;" id="btnsearch" class="btn btn-primary btn-sm">查询</a>
+                                </form>
+                            </div>
+                            <!---search end---->
+                            <table id="dg" data-mobile-responsive="true">
+                            </table>
+                        </div>
+                    </div>
+                    <!-- End Example Events -->
+                </div>
+            </div>
+    <div class="row">     
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>分润</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="graph_flot.html#">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-user">
+                            <li>
+                                <a href="graph_flot.html#">选项1</a>
+                            </li>
+                            <li>
+                                <a href="graph_flot.html#">选项2</a>
+                            </li>
+                        </ul>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+
+                    <div class="echarts" id="echarts-bar-chart"></div>
+                </div>
+            </div>
+        </div>
+     </div>
+  </div>
+<script src="/static/js/plugins/layer/laydate/laydate.js"></script>
+    <script type="text/javascript">
+        var xx=<{$xx}>;
+        var dd=<{$dd}>;
+    var t = echarts.init(document.getElementById("echarts-bar-chart")),
+    n = {
+        title: {
+            text: "分润"
+        },
+        tooltip: {
+            trigger: "axis"
+        },
+        legend: {
+            data: ["分润"]
+        },
+        grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true
+        },
+        calculable: !0,
+        xAxis: [{
+            type: "category",
+            data: xx
+        }],
+        yAxis: [{
+            type: "value"
+        }],
+        series: [{
+            name: "分润",
+            type: "bar",
+            data: dd,
+
+        }]
+    };
+    t.setOption(n),
+    window.onresize = t.resize;
+    var start = {
+        elem: "#start",
+        format: "YYYY-MM-DD hh:mm:ss",
+        min: "2018-01-0 23:59:59",
+        max: "2099-06-16 23:59:59",
+        istime: true,
+        istoday: false,
+        choose: function (datas) {
+            end.min = datas;
+            end.start = datas
+        }
+    };
+    var end = {
+        elem: "#end",
+        format: "YYYY-MM-DD hh:mm:ss",
+        min: "2018-01-0 23:59:59",
+        max: "2099-06-16 23:59:59",
+        istime: true,
+        istoday: false,
+        choose: function (datas) {
+            start.max = datas
+        }
+    };
+    laydate(start);
+    laydate(end);
+    $("#btnsearch").click(function(){
+         var start=$("#start").val();
+         var end=$("#end").val();
+          console.log(start);
+          start=Date.parse(new Date(start))
+          end=Date.parse(new Date(end))
+          var less=end-start;
+          var day=less/3600000/24;
+          console.log(day);
+          if(day>33){
+              alert("查询区间不能大于33天");
+          return false;
+              }
+          
+         $("form").submit();
+        
+        })
+    </script>
+        
+        
+        
+        
+        
+
+<{include file="public/footer"}>

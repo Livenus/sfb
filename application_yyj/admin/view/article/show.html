@@ -1,0 +1,275 @@
+<link rel="shortcut icon" href="favicon.ico"> <link href="/static/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="/static/css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
+    <link href="/static/css/animate.css" rel="stylesheet">
+    <link href="/static/css/style.css?v=4.1.0" rel="stylesheet">
+    <script src="/static/js/jquery.min.js?v=2.1.4"></script>
+  <link type="text/css" rel="stylesheet" href="/static/css/plugins/iCheck/custom.css">
+    <script type="text/javascript" charset="utf-8" src="/static/js/plugins/iCheck/icheck.min.js"></script>
+    <link type="text/css" rel="stylesheet" href="/static/\/css/bootstrap-switch.min.css">
+    <link type="text/css" rel="stylesheet" href="/static//css/plugins/iCheck/custom.css">
+    <link type="text/css" rel="stylesheet" href="/static/css/bootstrap-table.css">
+
+
+ <link rel="shortcut icon" href="favicon.ico"> <link href="/static/css/bootstrap.min.css?v=3.3.6" rel="stylesheet">
+    <link href="/static/css/font-awesome.css?v=4.4.0" rel="stylesheet">
+    <link href="/static/css/animate.css" rel="stylesheet">
+    <link href="/static/css/plugins/summernote/summernote.css" rel="stylesheet">
+    <link href="/static/css/plugins/summernote/summernote-bs3.css" rel="stylesheet">
+    <link href="/static/css/style.css?v=4.1.0" rel="stylesheet">
+
+
+    <div class="easyui-panel" title="新增/修改文章" fit=true>
+        <div style="padding:10px 60px 20px 60px">
+       
+ <div class="ibox-content">
+                        <form method="post" class="form-horizontal" id="art">
+                           
+
+                            <?php  foreach((array)$data as $k => $v){ ?>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">标题</label>
+
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" name="title" value="<?php echo($v['title'])?>">
+                                </div>
+                            </div>
+                              <div class="hr-line-dashed"></div>
+                         
+
+
+
+
+                                         <div class="form-group ">
+                                        <label class="col-sm-2 control-label">状态</label>
+                                        <div class="col-sm-4">
+                                            <div class="checkbox i_checks" style="display: inline-block;">
+                                                <label class="">
+                                                    <div class="iradio_square-green" style="position: relative;">
+                                                        <input type="radio" value="0" name="stat" style="position: absolute; opacity: 0;" <?php if($v['stat']!=1){?>checked<?php } ?>>
+                                                            <ins class="iCheck-helper" style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; height: 100%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
+                                                    </div>禁用 &nbsp;&nbsp;&nbsp;&nbsp;
+                                                    </label>
+                                            </div>
+                                            <div class="checkbox i_checks" style="display: inline-block;">
+                                                <label class="">
+                                                    <div class="iradio_square-green" style="position: relative;">
+                                                        <input type="radio" value="1" name="stat" style="position: absolute; opacity: 0;" <?php if($v['stat']==1){?>checked<?php } ?>>
+                                                            <ins class="iCheck-helper" style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; height: 100%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
+                                                    </div>启用 &nbsp;&nbsp;&nbsp;&nbsp;
+                                                    </label>
+                                            </div>
+
+                                           
+                                            <script>
+                                            ;
+                                            $('.i_checks').iCheck({ checkboxClass: 'icheckbox_square-green', radioClass: 'iradio_square-green', });
+                                            </script>
+                                            <span class="help-block m-b-none"></span>
+                                        </div>
+                                    </div>
+
+
+                                 <!--   <div class="form-group">
+                                      <label class="col-sm-2 control-label">时间：</label>
+                                      <div class="col-sm-10">
+                                          <input class="form-control layer-date" name="addtime" placeholder="YYYY-MM-DD hh:mm:ss" value="<?php echo (date("Y-m-d H:i:s",$v['addtime'])); ?>"
+                                          onclick="laydate({istime: true, format: 'YYYY-MM-DD hh:mm:ss'})">
+                                          <label class="laydate-icon"></label>
+                                      </div>
+                                  </div> -->
+
+
+                           
+                    
+                      
+                            
+                          
+                            <div class="hr-line-dashed"></div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">类型</label>
+                                <input type="hidden" name="code" value="" id="code">
+                                <div class="col-sm-10">
+                                    <select class="form-control m-b" name="type" id="type">
+                                        <option  <?php if($v['type']==1){ ?>selected<?php } ?> value="1">协议</option>
+                                        <option  <?php if($v['type']==2){ ?>selected<?php } ?>  value="2">帮助</option>
+                                        <option  <?php if($v['type']==3){ ?>selected<?php } ?>  value="3">未知</option>
+                                      
+                                    </select>
+
+                             
+                                </div>
+                            </div>
+                         
+                            <div class="hr-line-dashed"></div>
+                      
+                  
+                           
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">简介</label>
+
+                                <div class="col-sm-10">
+                                  
+                                   <textarea name="des" class="form-control input-lg m-b"> <?php echo($v['des'])?></textarea>
+                                </div>
+                            </div>     
+                   <div class="hr-line-dashed"></div>
+    <div class="form-group">      
+        <label class="col-sm-2 control-label"></label>
+
+        <div class="row">
+
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>内容</h5>
+                        <a id="edit" class="btn btn-primary btn-xs m-l-sm" onclick="edit()" type="button">编辑</a>
+                        <a id="save" class="btn btn-primary  btn-xs" onclick="save()" type="button">保存</a>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content" id="eg">
+<input type="hidden" name="content" id="content1"> 
+                        <div class="click2edit wrapper" id="content">
+                          
+                          <?php echo(html_entity_decode($v['content']))?>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+   
+          <div class="hr-line-dashed"></div>
+                            <div class="form-group">
+                                <div class="col-sm-4 col-sm-offset-2">
+                                    <a class="btn btn-primary" type="" onclick="submitForm(<?php echo($v['id'])?>)">保存内容</a>
+                                    <a class="btn btn-white" type="">取消</a>
+                                </div>
+                            </div>
+           <?php }?>
+         </form>
+        </div>
+    </div>
+
+
+ <!-- 全局js -->
+   
+    <script src="/static/js/bootstrap.min.js?v=3.3.6"></script>
+
+
+
+    <!-- 自定义js -->
+    <script src="/static/js/content.js?v=1.0.0"></script>
+
+
+    <!-- SUMMERNOTE -->
+    <script src="/static/js/plugins/summernote/summernote.min.js"></script>
+    <script src="/static/js/plugins/summernote/summernote-zh-CN.js"></script>
+
+    <script>
+ 
+    function edit() {
+            $("#eg").addClass("no-padding");
+            $('.click2edit').summernote({
+                lang: 'zh-CN',
+                focus: true
+            });
+        };
+        $(document).ready(function () {
+
+            $('.summernote').summernote({
+                lang: 'zh-CN'
+            });
+
+        });
+         
+        var save = function () {
+            $("#eg").removeClass("no-padding");
+            var aHTML = $('.click2edit').code(); //save HTML If you need(aHTML: array).
+            $('.click2edit').destroy();
+        };
+ 
+    </script>
+
+
+
+<!-- layerDate plugin javascript -->
+    <script src="/static/js/plugins/layer/laydate/laydate.js"></script>
+    <script>
+        //外部js调用
+        laydate({
+            elem: '#hello', //目标元素。由于laydate.js封装了一个轻量级的选择器引擎，因此elem还允许你传入class、tag但必须按照这种方式 '#id .class'
+            event: 'focus' //响应事件。如果没有传入event，则按照默认的click
+        });
+
+        //日期范围限制
+        var start = {
+            elem: '#start',
+            format: 'YYYY/MM/DD hh:mm:ss',
+            min: laydate.now(), //设定最小日期为当前日期
+            max: '2099-06-16 23:59:59', //最大日期
+            istime: true,
+            istoday: false,
+            choose: function (datas) {
+                end.min = datas; //开始日选好后，重置结束日的最小日期
+                end.start = datas //将结束日的初始值设定为开始日
+            }
+        };
+        var end = {
+            elem: '#end',
+            format: 'YYYY/MM/DD hh:mm:ss',
+            min: laydate.now(),
+            max: '2099-06-16 23:59:59',
+            istime: true,
+            istoday: false,
+            choose: function (datas) {
+                start.max = datas; //结束日选好后，重置开始日的最大日期
+            }
+        };
+        laydate(start);
+        laydate(end);
+    </script>
+
+
+
+    <script>
+
+        function submitForm(id){
+            
+            var type;
+            type=$("#type").val();
+            if(type==1){
+                $("#code").val('1');
+            }
+            var content;
+            content=$("#content").html();
+            $("#content1").val(content);
+            var form = $("#art");
+            $.ajax({
+                url:"/admin/article/edit/id/"+id+".html",
+                data:form.serialize(),
+                method:'post',
+                dataType:'json',
+                success:function(d){
+                    //alert(1);
+                    if(d.stat == '1'){
+                        alert(d.msg);
+                        //$.messager.alert('提示', d.msg?d.msg:'操作成功', 'success');
+                        location.href="/admin/article/index/";
+                    }else{
+                        alert(d.msg);
+                       // $.messager.alert('提示', d.msg?d.msg:'操作失败', 'error');
+                    }
+                }
+                    
+            });
+        }
+
+    </script>
+</body>
+
+

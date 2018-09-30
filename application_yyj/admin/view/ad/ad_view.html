@@ -1,0 +1,247 @@
+<{include file="public/header" }>
+<link type="text/css" rel="stylesheet" href="/static/css/plugins/iCheck/custom.css">
+<link rel="stylesheet" type="text/css" href="/static/css/plugins/webuploader/webuploader.css">
+<link rel="stylesheet" type="text/css" href="/static/css/webuploader-demo.css">
+<style>
+    body {
+        background: #f3f3f4;
+    }
+</style>
+<script type="text/javascript" charset="utf-8" src="/static/js/plugins/iCheck/icheck.min.js"></script>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="tabs-container ibox-title">
+                <ul class="nav nav-tabs ">
+                    <li><a class="icon iconfont icon-favor_light" href="<{:url('ad/index')}>" class="jf_sub_menu">广告管理</a></li>
+                    <li class="active"><a href="javascript:;">新增/修改广告</a></li>
+                </ul>
+                <div class="ibox-content">
+                    <div class="">
+                        <form class="form-horizontal" id="form1" onclick="return false">
+                            <div class="panel-heading">
+                                <{switch name="action" }>
+                                <{case value="add" }>添加新<{/case}>
+                                <{case value="edit" }>修改<{/case}>
+                                <{/switch}>广告
+                            </div> 
+                            <div class="">
+                                <input type="hidden" value="<{$info.id}>" name="id">
+                                <div class="form-group ">
+                                    <div class="col-sm-2 control-label">广告所属位置</div>
+                                    <div class="col-sm-4">
+                                        <{if condition="$ap_id neq null"}>
+                                        <select id="ap_id" class="input_zdy input-sm" name="ap_id" <{if condition="$ap_id neq null"}>disabled<{/if}>>
+                                                <{volist name="lists" id="position" empty="没有可用的广告位置" }>
+                                                <option value="<{$position.id}>" <{if condition="$ap_id eq $position.id"}>selected<{/if}><{if condition="$position.id eq $info.id" }>selected<{/if}>>
+                                                <{$position.name}>
+                                        </option>
+                                        <{/volist}>
+                                    </select>
+                                    <input type="hidden" name="ap_id" value="<{$ap_id}>">
+                                    <{else}>
+                                    <select id="ap_id" class="input_zdy input-sm" name="ap_id">
+                                        <{volist name="lists" id="position" empty="没有可用的广告位置" }>
+                                        <option value="<{$position.id}>"<{if condition="$position.id eq $info.ap_id" }>selected<{/if}>>
+                                                <{$position.name}>
+                                    </option>
+                                    <{/volist}>
+                                </select>
+                                <{/if}>
+
+                            </div>
+                        </div>
+                        <div class="form-group ">
+                            <div class="col-sm-2 control-label">名称</div>
+                            <div class="col-sm-4">
+                                <input id="formitem_1" type="text" class="form-control" value="<{$info.name}>" name="name">
+                                <span class="help-block m-b-none"></span>
+                            </div>
+                        </div>
+                        <div class="form-group ">
+                            <div class="col-sm-2 control-label">描述</div>
+                            <div class="col-sm-4">
+                                <textarea id="formitem_1" type="text" class="form-control" name="content" rows="6"><{$info.content}></textarea>
+                                <span class="help-block m-b-none"></span>
+                            </div>
+                        </div>   
+                        <div class="form-group ">
+                            <div class="col-sm-2 control-label">广告链接</div>
+                            <div class="col-sm-4">
+                                <input id="formitem_1" type="text" class="form-control" value="<{$info.url}>" name="url">
+                                <span class="help-block m-b-none"></span>
+                            </div>
+                        </div>
+                        <div class="form-group ">
+                            <div class="col-sm-2 control-label">title</div>
+                            <div class="col-sm-4">
+                                <input id="formitem_1" type="text" class="form-control" value="<{$info.title}>" name="title">
+                                <span class="help-block m-b-none"></span>
+                            </div>
+                        </div>
+                        <div class="form-group ">
+                            <div class="col-sm-2 control-label">排序</div>
+                            <div class="col-sm-4">
+                                <input id="formitem_1" type="number" min="0" class="form-control" value="<{$info.adv_order}>" name="order">
+                                <span class="help-block m-b-none"></span>
+                            </div>
+                        </div>
+                        <div class="form-group ">
+                            <div class="col-sm-2 control-label">图片</div>
+                            <div class="col-sm-4">
+                                <div class="input-group">
+                                    <input id="formitem_7" type="text" class="form-control" value="<{$info.photo}>" name="photo" readonly="">
+                                    <span class="input-group-btn"> <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal4" >上传
+                                            <span class="input-group-btn"></span></button>
+                                    </span>
+                                    <span class="input-group-btn"><button type="button" id="clearimg_formitem_7" class="btn btn-info"><i class="fa fa-eye"></i>清空</button></span>
+                                    <script>
+                                        $("#clearimg_formitem_7").click(function () {
+                                            var url = $('#formitem_7').val('');
+
+                                        });
+                                    </script>
+                                </div>
+                                <div class="input-group" style="margin-top:.5em;">
+                                    <img src="/uploads/<{$info.photo}>" class="img-responsive img-thumbnail" width="150" onerror="this.src='/static/image/nopic.jpg'" id="preimg">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group ">
+                            <div class="col-sm-2 control-label">状态</div>
+                            <div class="col-sm-4">
+                                <div class="checkbox i_checks" style="display: inline-block;">
+                                    <label class="">
+                                        <div class="iradio_square-green" style="position: relative;">
+                                            <input type="radio" value="0" name="stat" style="position: absolute; opacity: 0;" <{if condition="$info.stat eq 0" }>checked
+                                                   <{/if}>>
+                                                   <ins class="iCheck-helper" style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; height: 100%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
+                                        </div>禁用 &nbsp;&nbsp;&nbsp;&nbsp;
+                                    </label>
+                                </div>
+                                <div class="checkbox i_checks" style="display: inline-block;">
+                                    <label class="">
+                                        <div class="iradio_square-green" style="position: relative;">
+                                            <input type="radio" value="1" name="stat" style="position: absolute; opacity: 0;" <{if condition="$info.stat eq 1" }>checked
+                                                   <{/if}>>
+                                                   <ins class="iCheck-helper" style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; height: 100%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
+                                        </div>启用 &nbsp;&nbsp;&nbsp;&nbsp;
+                                    </label>
+                                </div>
+
+
+                                <script>
+                                    ;
+                                    $('.i_checks').iCheck({checkboxClass: 'icheckbox_square-green', radioClass: 'iradio_square-green', });
+                                </script>
+                                <span class="help-block m-b-none"></span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-2">
+                                <a href="javascript:;" id="submit" class="btn btn-warning btnbottom">立即保存</a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+
+<div class="modal fade" id="myModal4" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+            <div class="modal-header">
+
+                <h4 class="modal-title" id="myModalLabel">您可以尝试文件拖拽或者点击添加图片按钮，来添加图片.</h4>
+            </div>
+            <div id="uploader">
+                <div class="queueList">
+                    <div id="dndArea" class="placeholder">
+                        <div id="filePicker"></div>
+                        <p>或将照片拖到这里，单次最多可选300张</p>
+                    </div>
+                </div>
+                <div class="statusBar" style="display:none;">
+                    <div class="progress">
+                        <span class="text">0%</span>
+                        <span class="percentage"></span>
+                    </div><div class="info"></div>
+                    <div class="btns">
+                        <div id="filePicker2"></div><div class="uploadBtn">开始上传</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div><!-- /.modal -->
+</div>
+<script src="/static/js/plugins/webuploader/webuploader.js"></script>
+<script>
+                                            function hider($type) {
+                                                var $class_text = $(".class_text");
+                                                var $class_photo = $(".class_photo");
+
+                                                if ($type == '1') {
+                                                    $class_text.show(300);
+                                                    $class_photo.hide(300);
+                                                } else if ($type == '2') {
+                                                    $class_text.hide(300);
+                                                    $class_photo.hide(300);
+                                                } else {
+                                                    $class_text.hide(300);
+                                                    $class_photo.show(300);
+                                                }
+                                            }
+                                            $(function () {
+                                                $("#submit").click(function () {
+                                                    var $form = $("#form1");
+                                                    $.ajax({
+                                                        url: "<{php}>echo url('ad/'.$action)<{/php}>",
+                                                        data: $form.serialize(),
+                                                        type: 'post',
+                                                        dataType: 'json',
+                                                        success: function (d) {
+                                                            if (d.stat == '1') {
+                                                                swal({
+                                                                    title: "太帅了",
+                                                                    text: d.msg ? d.msg : '操作成功！',
+                                                                    type: "success"
+                                                                }, function () {
+                                                                    location.href = "<{:url('ad/index')}>";
+                                                                });
+                                                            } else {
+                                                                swal({
+                                                                    title: "出错了",
+                                                                    text: d.msg ? d.msg : '操作失败',
+                                                                    type: "error"
+                                                                });
+                                                            }
+                                                        },
+                                                        error: function (d) {
+                                                            swal({
+                                                                title: "出错了",
+                                                                text: d.msg ? d.msg : '操作失败',
+                                                                type: "error"
+                                                            });
+                                                        }
+                                                    });
+                                                });
+                                            });
+ var i=1;                           
+$('#myModal4').on('shown.bs.modal', function (e) {
+    console.log(323);
+    if(i){
+ $.getScript("/static/js/webuploader-demo.js");  
+    }
+ 
+  i=0;
+})                                         
+</script>
+<{include file="public/footer" }>

@@ -1,0 +1,253 @@
+<{include file="public/header"}>
+<script type="text/javascript" charset="utf-8" src="/static/js/plugins/bootstrap-table/bootstrap-table.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="/static/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js"></script>
+<link rel="stylesheet" href="/static/css/plugins/bootstraptable/bootstrap-table.min.css">
+<style>
+    table img{max-width: 100px;height:27px;}
+</style>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="ibox float-e-margins">
+        <div class="ibox-title" style=" padding-bottom: 0;">
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="javascript:;">会员组列表</a></li>
+                <li ><a class="icon iconfont icon-favor_light" href="<{:url('membergroup/gadd')}>" class="jf_sub_menu">新增/修改会员组</a></li>
+            </ul>
+        </div>
+        <div class="ibox-content">
+
+            <div class="row row-lg">
+                <div class="col-sm-12">
+                    <!-- Example Events -->
+                    <div class="example-wrap">
+                        <div class="example">
+                            <div class="hidden-xs" id="exampleTableEventsToolbar" role="group">
+                                <button type="button" class="btn btn-sm btn-primary" id="btnadd">
+                                    <i class="glyphicon glyphicon-plus" aria-hidden="true"></i> 添加会员组
+                                </button>
+                                <button type="button" class="btn btn-sm btn-white" id="btndel">
+                                    <i class="glyphicon glyphicon-trash" aria-hidden="true"></i> 删除会员组
+                                </button>
+                            </div>
+                            <!---search start-->
+                            <div class="right">
+                                <span style=" line-height: 30px; margin-right: 5px;">会员组名:</span><input type="text" id="ap_name" value="" class="input_zdy input-sm" size=15 placeholder="包含的字符"/>
+                                <a href="javascript:;" id="btnsearch" class="btn btn-primary btn-sm">查询</a>
+                            </div>
+                            <!---search end---->
+                            <table id="dg" data-mobile-responsive="true">
+                            </table>
+                        </div>
+                    </div>
+                    <!-- End Example Events -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var update_url="<{:url('Membergroup/update_status')}>";
+    function getQueryParams() {
+        var q = {};
+        q.ap_name = $("#ap_name").val();
+        return q;
+    }
+    $("#btnsearch").click(function () {
+        q = getQueryParams();
+        var url = "<{:url('membergroup/grouplistajax')}>";
+        $("#dg").bootstrapTable('refresh', {url: url, query: q});
+    })
+    $("#btnadd").click(function () {
+        location.href = "<{:url('membergroup/gadd')}>";
+    })
+    $("#btndel").click(function () {
+        var items = $("#dg").bootstrapTable('getSelections');
+        items = objcolum(items, 'id');
+        if (items.length <= 0) {
+            swal("出错了", "请选择要删除的值", "error");
+        } else {
+            del(items);
+        }
+    });
+    function del(ids) {
+        swal({
+            title: "您确定要删除吗",
+            text: "删除后将无法恢复，请谨慎操作！",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            closeOnConfirm: false,
+            closeOnCancel: false
+        },
+                function (isConfirm) {
+                    if (isConfirm) {
+                        if (!$.isArray(ids)) {
+                            ids = [ids];
+                        }
+                        $.ajax({
+                            url: "<{:url('membergroup/gdel')}>",
+                            data: {id: ids},
+                            type: 'post',
+                            dataType: 'json',
+                            success: function (d) {
+                                if (d.stat == '1') {
+                                    swal({
+                                        title: "太帅了",
+                                        text: d.msg,
+                                        type: "success"
+                                    }, function () {
+                                        location.href = "<{:url('membergroup/grouplist')}>";
+                                    });
+                                } else {
+                                    swal({
+                                        title: "出错了",
+                                        text: d.msg,
+                                        type: "error"
+                                    });
+                                }
+                            }
+                        });
+                        //swal("删除成功！", "您已经永久删除了这条信息。", "success");
+                    } else {
+                        swal("已取消", "您取消了删除操作！", "error");
+                    }
+                });
+
+
+    }
+    $(function () {
+        $('#dg').bootstrapTable({
+            url: "<{:url('membergroup/grouplistajax')}>",
+            //method:'post',
+            queryParams: function (params) {
+                params.p = parseInt(params.offset / params.limit) + 1;
+                params = $.extend(params, getQueryParams());
+                return params;
+            },
+            queryParamsType: "limit",
+            contentType: 'application/json',
+            dataType: 'json',
+            sidePagination: "server", //表示服务端请求
+            pagination: true, //启动分页
+            pageNumber: 1, //当前第几页
+            pageSize: 20, //每页显示的记录数
+            pageList: [10, 15, 20], //记录数可选列表
+            dataField: 'rows',
+            idField: "id",
+            columns: [{checkbox: true, align: 'center', valign: 'middle'},
+                {title: '等级', field: 'id', align: 'center', valign: 'middle'},
+                {title: '名称', field: 'name', align: 'center', valign: 'middle'},
+                {title: '等级图标', field: 'photo', align: 'center', valign: 'middle',formatter: function (value, row, index) {
+                        if(row.photo){
+                            html="<img src='/uploads/"+row.photo+"'>";
+                        }else{
+                            html="";
+                        }
+                        
+                        
+                        return html;
+                }},
+               {title: '升级金额(元)', field: 'money', align: 'center', valign: 'middle'},
+               {title: '推荐人数', field: 'intr_num', align: 'center', valign: 'middle'},
+               {title: '无积分汇率(‰)(pointsType=1)', field: 'rate_1', align: 'center', valign: 'middle'},
+               {title: '有积分汇率(‰)(pointsType=0)', field: 'rate_2', align: 'center', valign: 'middle'},
+                {title: '启用', field: 'stat', align: 'center', valign: 'middle',
+                    formatter: function (value, row, index) {
+                        var html="";
+                        if (row.stat == '1') {
+                            html = '<i class="fa fa-toggle-on infoOn upstatus" data-status='+0+' data-id='+row.id +'></i>';
+                        } else {
+                            html = '<i class="fa fa-toggle-on infoOff upstatus" data-status='+1+' data-id='+row.id +'></i>';
+                        }
+                        return html;
+                    }},
+                {title: '操作', field: 'n_do', align: 'center', valign: 'middle',
+                    formatter: function (value, row, index) {
+                        var html = '';
+                        html = ' <a href="<{:url(\'membergroup/gedit\')}>?id=' + row.id + '" class="btn btn-warning btn-sm" data-toggle="tooltip" data-placement="top" title="编辑" style=" margin-right:4px;"><span class="glyphicon glyphicon-edit"></span> 编辑</a>'
+        
+                        return html;
+                    }
+                }],
+            responseHandler: function (res) {
+                //远程数据加载之前,处理程序响应数据格式,对象包含的参数: 我们可以对返回的数据格式进行处理
+                //在ajax后我们可以在这里进行一些事件的处理
+                return res;
+            },
+            search: false,
+            iconSize: 'outline',
+            toolbar: '#exampleTableEventsToolbar',
+            icons: {
+                refresh: 'glyphicon-repeat',
+                toggle: 'glyphicon-list-alt',
+                columns: 'glyphicon-list'
+            },
+            toolbarAlign: 'left',
+            showToggle: true,
+            showColumns: false, //显示下拉框勾选要显示的列
+            // minimumCountColumns:3, 
+            showRefresh: true, //显示刷新按钮
+            striped: true, //表格显示条纹
+            singleSelect: false, //复选框只能选择一条记录  
+            clickToSelect: false, //点击行即可选中单选/复选框  
+            checkboxHeader: true
+        });
+        function alert_m(msg){
+                            swal("提示信息", msg, "success");   
+}
+   function update_post(url,data,msg){
+       $.post(url,data,function(data){
+           
+           if(data.stat==1){
+               msg();
+           }else{
+               alert(data.msg);
+           }
+       })
+   } 
+   function confirm_dialog(title,dec,action){
+ swal({
+        title: title,
+        text: dec,
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        cancelButtonText:"取消",
+        confirmButtonText: "确认",
+        closeOnConfirm: false
+    }, function (isConfirm) {
+        if(isConfirm){
+        action();    
+        }
+    });
+       
+   }
+   $("body").on("click",".upstatus",function(e){
+        e.preventDefault();
+        var status=$(this).attr("data-status");
+
+         var id=$(this).attr("data-id");
+       var data={id:id,status:status};
+       var url=update_url;
+         if(status==1){
+             var msg="确认启会员类型";
+         }else{
+             var msg="确认屏蔽会员类型";   
+         };
+confirm_dialog("确认提示",msg,function(){
+
+        if(id){
+            
+            update_post(url,data,function(){
+                        swal("操作成功！", msg, "success");   
+                        $("#dg").bootstrapTable("refresh");
+            });
+        }
+
+    
+});
+    })
+    });
+</script>
+<{include file="public/footer"}>

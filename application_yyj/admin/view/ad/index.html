@@ -1,0 +1,187 @@
+<{include file="public/header"}>
+<script type="text/javascript" charset="utf-8" src="/static/js/plugins/bootstrap-table/bootstrap-table.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="/static/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js"></script>
+<link rel="stylesheet" href="/static/css/plugins/bootstraptable/bootstrap-table.min.css">
+
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title" style=" padding-bottom: 0;">
+                 <ul class="nav nav-tabs">
+					<li class="active"><a href="javascript:;">广告管理</a></li>
+					<li ><a class="icon iconfont icon-favor_light" href="<{:url('ad/add')}>" class="jf_sub_menu">新增/修改广告</a></li>
+				</ul>
+            </div>
+            <div class="ibox-content">
+
+                <div class="row row-lg">
+                    <div class="col-sm-12">
+                        <!-- Example Events -->
+                        <div class="example-wrap">
+                            <div class="example">
+                                <div class="hidden-xs" id="exampleTableEventsToolbar" role="group">
+                                    <button type="button" class="btn btn-sm btn-primary" id="btnadd">
+                                        <i class="glyphicon glyphicon-plus" aria-hidden="true"></i> 添加新广告
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-white" id="btndel">
+                                        <i class="glyphicon glyphicon-trash" aria-hidden="true"></i> 删除广告
+                                    </button>
+                                </div>
+                                <!---search start-->
+                                <div class="right">
+                                    <span style=" line-height: 30px; margin-right: 5px;">所属广告位置:</span>
+                                    <select id="ap_id" class="input_zdy input-sm">
+                                        <option value='0'>全部</option>
+                                        <{volist name="lists" id="position"}>
+										<option value="<{$position.id}>" <{if condition="$ap_id eq $position.id"}>selected<{/if}>><{$position.name}></option>
+										<{/volist}>
+                                    </select>
+                                    <span style=" line-height: 30px; margin-right: 5px;">广告名字:</span>
+                                    <input type="text" id="a_name" value="" class="input_zdy input-sm" size=15 placeholder="包含的字符"/>
+                                    <a href="javascript:;" id="btnsearch" class="btn btn-primary btn-sm">查询</a>
+                                </div>
+                                <!---search end---->
+                                <table id="dg" data-height="100%" data-mobile-responsive="true">
+                                </table>
+                            </div>
+                        </div>
+                        <!-- End Example Events -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+    function getQueryParams(){
+        var q = {};
+        q.ap_id = $("#ap_id").val();
+        q.a_name = $("#a_name").val();
+        return q;
+    }
+    $("#btnsearch").click(function(){
+		q = getQueryParams();
+		$("#dg").bootstrapTable('refresh', {url: "<{:url('ad/listajax')}>",query:q}); 
+    })
+    $("#btnadd").click(function(){
+    	location.href="<{:url('ad/add')}>";
+    })
+    
+	$("#btndel").click(function(){
+    	var items = $("#dg").bootstrapTable('getSelections');
+    	items = objcolum(items,'id');
+    	if(items.length <= 0){
+    		swal("出错了", "请选择要删除的值", "error");
+    	}else{
+			del(items);
+		}
+    });
+	function del(ids){
+		swal({
+			title: "您确定要删除吗",
+			text: "删除后将无法恢复，请谨慎操作！",
+			type: "warning",
+			showCancelButton: true,
+			confirmButtonColor: "#DD6B55",
+			confirmButtonText: "确定",
+			cancelButtonText: "取消",
+			closeOnConfirm: false,
+			closeOnCancel: false
+		},
+		function (isConfirm) {
+			if (isConfirm) {
+				if(!$.isArray(ids)){
+					ids = [ids];
+				}
+				$.ajax({
+					url:"<{:url('ad/del')}>",
+					data:{id:ids},
+					type:'post',
+					dataType:'json',
+					success:function(d){
+						if(d.stat == '1'){
+							swal({
+								title: "太帅了",
+								text: d.msg,
+								type: "success"
+							},function(){
+								location.href="<{:url('ad/index')}>";
+							});
+						}else{
+							swal({
+								title: "出错了",
+								text: d.msg,
+								type: "error"
+							});
+						}
+					}
+				});
+				//swal("删除成功！", "您已经永久删除了这条信息。", "success");
+			} else {
+				swal("已取消", "您取消了删除操作！", "error");
+			}
+		});
+	}
+    $(function(){
+		$('#dg').bootstrapTable({
+			url:"<{:url('ad/listajax')}>",
+			//method:'post',
+			queryParams:function(params){
+				params.p = parseInt(params.offset/params.limit)+1;
+				params = $.extend(params,getQueryParams());
+				return params;
+			},
+			queryParamsType:"limit",
+			contentType:'application/json',
+			dataType:'json',
+			sidePagination: "server", //表示服务端请求
+			pagination:true,//启动分页
+			pageNumber:1,//当前第几页
+			pageSize:20,//每页显示的记录数
+			pageList:[10,15,20], //记录数可选列表
+			dataField:'rows',
+			idField:"id",
+			columns:[{checkbox: true,align: 'center', valign: 'middle'},
+                                       {title: 'id',field: 'id',align: 'center',valign: 'middle'},
+					{title: '广告名称',field: 'name',align: 'center',valign: 'middle'},
+					{title: '所在广告位置',field: 'position',align: 'center',valign: 'middle'},
+					{title: '状态',field: 'stat',align: 'center',valign: 'middle'},
+					/*{title: '开始时间',field: 'a_start_date',align: 'center',valign: 'middle',
+						formatter:function(value,row,index){
+							return int2date('yyyy-MM-d h:m:s',row.a_start_date);
+					}},
+					{title: '结束时间',field: 'a_end_date',align: 'center',valign: 'middle',
+						formatter:function(value,row,index){
+							return int2date('yyyy-MM-d h:m:s',row.a_end_date);
+					}},*/
+					{title: '操作',field: 'n_do',align: 'center',valign: 'middle',
+						formatter:function(value,row,index){
+							var html = '';
+							html = '<a href="<{:url(\'ad/edit\')}>?id='+row.id+'" class="btn btn-warning btn-sm" data-toggle="tooltip" data-placement="top" title="编辑" style=" margin-right:4px;"><span class="glyphicon glyphicon-edit"></span> 编辑</a><a href="javascript:;" onclick="del('+row.id+')" class="btn btn-warning btn-sm" data-toggle="tooltip" data-placement="top" title="删除" style=" margin-right:4px;"><span class="glyphicon glyphicon-remove"></span> 删除</a>';
+							return html;
+						}
+					}],
+			responseHandler:function(res){
+			  //远程数据加载之前,处理程序响应数据格式,对象包含的参数: 我们可以对返回的数据格式进行处理
+			  //在ajax后我们可以在这里进行一些事件的处理
+			  return res;
+			},
+			search:false,
+			iconSize: 'outline',
+			toolbar: '#exampleTableEventsToolbar',
+			icons: {
+				refresh: 'glyphicon-repeat',
+				toggle: 'glyphicon-list-alt',
+				columns: 'glyphicon-list'
+			},
+			toolbarAlign:'left',
+			showToggle:false,
+			showColumns:false,//显示下拉框勾选要显示的列
+		   // minimumCountColumns:3,
+		   // showRefresh:true,//显示刷新按钮
+			striped:true,//表格显示条纹
+			singleSelect:false,//复选框只能选择一条记录  
+			clickToSelect:false,//点击行即可选中单选/复选框  
+			checkboxHeader:true
+		});
+    });
+    </script>
+<{include file="public/footer"}>

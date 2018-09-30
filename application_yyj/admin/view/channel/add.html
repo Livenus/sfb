@@ -1,0 +1,341 @@
+<{include file="public/header" }>
+    <link type="text/css" rel="stylesheet" href="/static/css/plugins/iCheck/custom.css">
+	<link rel="stylesheet" type="text/css" href="/static/css/plugins/webuploader/webuploader.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/webuploader-demo.css">
+    <!--日期-->
+    <!-- layerDate plugin javascript -->
+<script src="/static/js/plugins/layer/laydate/laydate.js"></script>
+    <style>
+    	 body {
+        background: #f3f3f4;
+    }
+    .col-sm-4 .form-control{
+        
+        width:90%;
+    }
+    .col-sm-4 .form-control,.help-block{
+        
+        display:inline-block;
+    }
+    </style>
+    <script type="text/javascript" charset="utf-8" src="/static/js/plugins/iCheck/icheck.min.js"></script>
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="tabs-container ibox-title">
+                    <ul class="nav nav-tabs ">
+                        <{if condition="$action eq 'index'" }>
+                            <li class="active"><a href="javascript:;">通道管理</a></li>
+                            <li><a class="icon iconfont icon-favor_light" href="<{:url('channel/add')}>" class="jf_sub_menu">新增通道</a></li>
+                            <{else}>
+                                <li><a class="icon iconfont icon-favor_light" href="<{:url('channel/index')}>" class="jf_sub_menu">通道管理</a></li>
+                                <li class="active"><a href="javascript:;">新增/修改通道</a></li>
+                                <{/if}>
+                    </ul>
+                    <div class="ibox-content">
+                        <div class="">
+                            <form class="form-horizontal" id="form1" onclick="return false">
+                               <div class="panel-heading">
+                                    <{switch name="action" }>
+                                        <{case value="add" }>添加新<{/case}>
+                                        <{case value="edit" }>修改<{/case}>
+                                    <{/switch}>通道
+                                </div> 
+                                <div class="">
+                                    <input type="hidden" value="<{$info.id}>" name="id">
+                                    <div class="form-group ">
+                                        <div class="col-sm-2 control-label">渠道</div>
+                                        <div class="col-sm-4">
+                                           <select name="type" class="form-control type">
+                                               <option value="0">请选择</option>
+                                               <{volist name="unionpay"  id="v"}>
+                                               <option value="<{$v.id}>" <{if condition="$info.type eq $v['id']"}>selected<{/if}>><{$v.name}></option>
+                                                 <{/volist}>
+                                           </select>
+                                            <span class="help-block m-b-none"></span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group ">
+                                        <div class="col-sm-2 control-label">通道接口</div>
+                                        <div class="col-sm-4">
+                                           <select name="pay_type" class="form-control pay_type" data-v="<{$info.pay_type}>">
+                                               <{volist name="unionpay"  id="v"}>
+                                                  <{volist name="v.pay_way"  id="vv"}>
+                                                  <option value="<{$vv.type}>" class="<{$v.id}>"  data="<{$vv.low_rate_money}>"  min="<{$vv.min}>"  max="<{$vv.max}>"><{$vv.name}></option>
+                                                    <{/volist}>
+                                                 <{/volist}>
+                                           </select>
+                                            <span class="help-block m-b-none"></span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group ">
+                                        <div class="col-sm-2 control-label">真实固定手续费</div>
+                                        <div class="col-sm-4">
+                                            <span id="real_rate" class="form-control"></span>
+                                            <span class="help-block m-b-none">元</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group ">
+                                        <div class="col-sm-2 control-label">真实代扣手续费</div>
+                                        <div class="col-sm-4">
+                                            <input id="formitem_1" type="text" class="form-control" value="<{$info.rate_money}>" name="rate_money">
+                                            <span class="help-block m-b-none">元</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group ">
+                                        <div class="col-sm-2 control-label">接口最小刷卡金额</div>
+                                        <div class="col-sm-4">
+                                            <span id="min" class="form-control"></span>
+                                            <span class="help-block m-b-none">元</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group ">
+                                        <div class="col-sm-2 control-label">接口最大刷卡金额</div>
+                                        <div class="col-sm-4">
+                                            <span id="max" class="form-control"></span>
+                                            <span class="help-block m-b-none">元</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group ">
+                                        <div class="col-sm-2 control-label">名称</div>
+                                        <div class="col-sm-4">
+                                            <input id="formitem_1" type="text" class="form-control" value="<{$info.name}>" name="name">
+                                            <span class="help-block m-b-none"></span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group ">
+                                        <div class="col-sm-2 control-label">到账时间</div>
+                                        <div class="col-sm-4">
+                                            <select name="account_time" class="form-control">
+   
+                                                <option value="D+0" <{if condition="$info['account_time'] eq 'D+0'"}>selected="selected"<{/if}> >D+0</option>
+                                                   <option value="T+1" <{if condition="$info['account_time'] eq 'T+1'"}>selected="selected"<{/if}> >T+1</option>
+                                                   <option value="T+0" <{if condition="$info['account_time'] eq 'T+0'"}>selected="selected"<{/if}>>T+0</option>
+                                                   <option value="D+1" <{if condition="$info['account_time'] eq 'D+1'"}>selected="selected"<{/if}>>D+1</option>
+
+                                            </select>
+                                            <span class="help-block m-b-none"></span>
+                                        </div>
+                                    </div> 
+                                    <div class="form-group ">
+                                        <div class="col-sm-2 control-label">最高金额</div>
+                                        <div class="col-sm-4">
+                                            <input id="formitem_1" type="text" class="form-control" value="<{$info.max_money}>" name="max_money">
+                                            <span class="help-block m-b-none">元</span>
+                                        </div>
+                                    </div> 
+                                    <div class="form-group ">
+                                        <div class="col-sm-2 control-label">最低金额</div>
+                                        <div class="col-sm-4">
+                                            <input id="formitem_1" type="text" class="form-control" value="<{$info.min_money}>" name="min_money">
+                                            <span class="help-block m-b-none">元</span>
+                                        </div>
+                                    </div> 
+                                    <div class="form-group ">
+                                        <div class="col-sm-2 control-label">开放时间</div>
+                                        <div class="col-sm-4">
+                                            <select name="start_time" class="form-control form_datetime">
+                                                <{for start="0" end="24"}>
+                                                <option value="<{$i}>:00"        <{if condition="$i eq $info.start_time"}>selected<{/if}>><{$i}>:00</option>
+                                                <{/for}>
+                                            </select>
+                                            <span class="help-block m-b-none"></span>
+                                        </div>
+                                    </div> 
+                                    <div class="form-group ">
+                                        <div class="col-sm-2 control-label">截止时间</div>
+                                        <div class="col-sm-4">
+                                            <select name="end_time" class="form-control form_datetime">
+                                                <{for start="0" end="24"}>
+                                                <option value="<{$i}>:00"        <{if condition="$i eq $info.end_time"}>selected<{/if}>><{$i}>:00</option>
+                                                <{/for}>
+                                            </select>
+                                            <span class="help-block m-b-none"></span>
+                                        </div>
+                                    </div> 
+
+                                    <div class="form-group ">
+                                        <div class="col-sm-2 control-label">简述</div>
+                                        <div class="col-sm-4">
+                                            <textarea name="desc" class="form-control"><{$info.desc}></textarea>
+                                        </div>
+                                    </div> 
+                                    <div class="form-group ">
+                                        <div class="col-sm-2 control-label">排序</div>
+                                        <div class="col-sm-4">
+                                            <input id="formitem_1" type="text" class="form-control" value="<{$info.sot}>" name="sot">
+                                            <span class="help-block m-b-none">值越小越排前</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group ">
+                                        <div class="col-sm-2 control-label">状态</div>
+                                        <div class="col-sm-4">
+                                            <div class="checkbox i_checks" style="display: inline-block;">
+                                                <label class="">
+                                                    <div class="iradio_square-green " style="position: relative;">
+                                                        <input type="radio" value="0" name="stat" style="position: absolute; opacity: 0;" <{if condition="$info['stat'] eq 0" }>checked<{/if}>>
+                                                            <ins class="iCheck-helper" style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; height: 100%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
+                                                    </div>禁用 &nbsp;&nbsp;&nbsp;&nbsp;
+                                                    </label>
+                                            </div>
+											<div class="checkbox i_checks" style="display: inline-block;">
+                                                <label class="">
+                                                    <div class="iradio_square-green " style="position: relative;">
+                                                        <input type="radio" value="1" name="stat" style="position: absolute; opacity: 0;" <{if condition="$info.stat eq 1" }>checked
+                                                        <{/if}>>
+                                                            <ins class="iCheck-helper" style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; height: 100%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
+                                                    </div>启用 &nbsp;&nbsp;&nbsp;&nbsp;
+                                                    </label>
+                                            </div>
+
+                                           
+                                            <script>
+                                            ;
+                                            $('.i_checks').iCheck({ checkboxClass: 'icheckbox_square-green', radioClass: 'iradio_square-green', });
+                                            </script>
+                                            <span class="help-block m-b-none"></span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-sm-4 col-sm-offset-2">
+                                            <a href="javascript:;" id="submit" class="btn btn-warning btnbottom">立即保存</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var add_url="<{:url('channel/add')}>";
+        var edit_url="<{:url('channel/edit')}>";
+    function hider($type) {
+        var $class_text = $(".class_text");
+        var $class_photo = $(".class_photo");
+
+        if ($type == '1') {
+            $class_text.show(300);
+            $class_photo.hide(300);
+        } else if ($type == '2') {
+            $class_text.hide(300);
+            $class_photo.hide(300);
+        } else {
+            $class_text.hide(300);
+            $class_photo.show(300);
+        }
+    }
+    $(function() {
+        $("#submit").click(function() {
+            var $form = $("#form1");
+            var min=$("#real_rate").text();
+            $form.append("<input name='rate_money_min' type='hidden' value='"+min+"'>");
+            if($("[name='id']").val()){
+                
+                var url=edit_url;
+            }else{
+                var url=add_url;
+            }
+            $.ajax({
+                url: url,
+                data: $form.serialize(),
+                type: 'post',
+                dataType: 'json',
+                success: function(d) {
+                    if (d.stat == '1') {
+                        swal({
+                            title: "太帅了",
+                            text: d.msg ? d.msg : '操作成功！',
+                            type: "success"
+                        }, function() {
+                            location.href = "<{:url('channel/index')}>";
+                        });
+                    } else {
+                        swal({
+                            title: "出错了",
+                            text: d.msg ? d.msg : '操作失败',
+                            type: "error"
+                        });
+                    }
+                },
+                error: function(d) {
+                    swal({
+                        title: "出错了",
+                        text: d.msg ? d.msg : '操作失败',
+                        type: "error"
+                    });
+                }
+            });
+        });
+    });
+    </script>
+   	<script>
+        var pay_types=$(".pay_type option");
+        $(".pay_type").empty();
+        $(".type").change(function(){
+            var id=$(this).val();
+            $(".pay_type").empty();
+            var str="";
+            for(var i=0;i<pay_types.length;i++){
+                if(pay_types.eq(i).hasClass(id)){
+                                   $(".pay_type").append(pay_types[i]);
+                                   
+                }
+
+            }
+            //
+            $("[name='pay_type']").change();
+        })
+        $("[name='pay_type']").change(function(){
+            var type=$(this).val();
+            $(".pay_type option").each(function(){
+                if($(this).attr("value")==type){
+                    var val=$(this).attr("data");
+                    console.log(val);
+                    $("#real_rate").text(val);
+                    var min=$(this).attr("min");
+                    $("#min").text(min);
+                    var max=$(this).attr("max");
+                    $("#max").text(max);
+                    $(this).attr("selected","selected");
+                }
+                
+            })
+            
+            
+            
+            
+        })
+        //初始化通道
+        if($("[name='name']").val()){
+            var id=$(".type").val();
+            var type=$(".pay_type").attr("data-v");
+            console.log(type);
+            for(var i=0;i<pay_types.length;i++){
+                if(pay_types.eq(i).hasClass(id)){
+                                    if(type==pay_types.eq(i).attr("value")){
+
+                                    }
+                                   $(".pay_type").append($(pay_types[i]));
+                }
+
+            }
+            $(".pay_type option").each(function(){
+                if($(this).attr("value")==type){
+                    var val=$(this).attr("data");
+                    console.log(val);
+                    $("#real_rate").text(val);
+                    var min=$(this).attr("min");
+                    $("#min").text(min);
+                    var max=$(this).attr("max");
+                    $("#max").text(max);
+                    $(this).attr("selected","selected");
+                }
+                
+            })
+        }
+    </script>
+    <{include file="public/footer" }>

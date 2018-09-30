@@ -1,0 +1,146 @@
+<{include file="public/header"}>
+<script type="text/javascript" charset="utf-8" src="/static/js/plugins/bootstrap-table/bootstrap-table.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="/static/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js"></script>
+<link rel="stylesheet" href="/static/css/plugins/bootstraptable/bootstrap-table.min.css">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="ibox float-e-margins">
+        <div class="ibox-title" style=" padding-bottom: 0;">
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="javascript:;">调试</a></li>
+            </ul>
+        </div>
+        <div class="ibox-content">
+
+            <div class="row row-lg">
+                <div class="col-sm-12">
+                    <!-- Example Events -->
+                    <div class="example-wrap">
+                        <div class="example">
+                            <div class="hidden-xs" id="exampleTableEventsToolbar" role="group">
+                            </div>
+                            <!---search start-->
+                            <div class="right">
+                                <form id="search">
+                                <span style=" line-height: 30px; margin-right: 5px;">开始时间</span>
+                                <input type="text" id="start" value="" class="input_zdy input-sm" size=25 placeholder="开始时间" name="start"/>
+                                <input name="type" type="hidden" value="13">
+                                <span style=" line-height: 30px; margin-right: 5px;">结束时间</span>
+                                <input type="text" id="end" value="" class="input_zdy input-sm" size=25 placeholder="结束时间" name="end"/>
+                                <span style=" line-height: 30px; margin-right: 5px;">用户</span>
+                                <input type="text" id="amount" value="" class="input_zdy input-sm" size=15 placeholder="用户名" name="from_user"/>
+                                <a href="javascript:;" id="btnsearch" class="btn btn-primary btn-sm">查询</a>
+                                </form>
+                            </div>
+                            <!---search end---->
+                            <table id="dg" data-mobile-responsive="true">
+                            </table>
+                        </div>
+                    </div>
+                    <!-- End Example Events -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- layerDate plugin javascript -->
+<script src="/static/js/plugins/layer/laydate/laydate.js"></script>
+<script>
+    var url_index="<{:url('debug/listajax')}>";
+    var update_edit = "<{:url('debug/edit')}>";
+    var url_del = "<{:url('debug/del')}>";
+    $("#btnsearch").click(function () {
+        q = getQueryParams();
+        var url=url_index;
+        $("#dg").bootstrapTable('refresh', {url: url, query: q});
+    })
+    function getQueryParams() {
+        var q = {};
+var params = $("#search").serializeArray();
+for (var item in params) {
+   q[params[item].name] = params[item].value;
+}
+        return q;
+    }
+
+    $(function () {
+        $('#dg').bootstrapTable({
+            url:url_index,
+            //method:'post',
+            queryParams: function (params) {
+                params.p = parseInt(params.offset / params.limit) + 1;
+                params = $.extend(params, getQueryParams());
+                return params;
+            },
+            queryParamsType: "limit",
+            contentType: 'application/json',
+            dataType: 'json',
+            sidePagination: "server", //表示服务端请求
+            pagination: true, //启动分页
+            pageNumber: 1, //当前第几页
+            pageSize: 10, //每页显示的记录数
+            pageList: [10, 15, 20], //记录数可选列表
+            dataField: 'rows',
+            idField: "id",
+            columns: [{checkbox: true, align: 'center', valign: 'middle'},
+                {title: 'id', field: 'id', align: 'center', valign: 'middle'},
+                {title: '用户id', field: 'member_id', align: 'center', valign: 'middle'},
+                {title: '请求地址', field: 'url', align: 'center', valign: 'middle'},
+                {title: '运行时间', field: 'times', align: 'center', valign: 'middle'},
+                {title: '发起时间', field: 'request', align: 'center', valign: 'middle'},
+              ],
+            responseHandler: function (res) {
+                //远程数据加载之前,处理程序响应数据格式,对象包含的参数: 我们可以对返回的数据格式进行处理
+                //在ajax后我们可以在这里进行一些事件的处理
+                return res;
+            },
+            search: false,
+            iconSize: 'outline',
+            toolbar: '#exampleTableEventsToolbar',
+            icons: {
+                refresh: 'glyphicon-repeat',
+                toggle: 'glyphicon-list-alt',
+                columns: 'glyphicon-list'
+            },
+            toolbarAlign: 'left',
+            showToggle: false,
+            showColumns: false, //显示下拉框勾选要显示的列
+            // minimumCountColumns:3,
+            // showRefresh:true,//显示刷新按钮
+            striped: true, //表格显示条纹
+            singleSelect: false, //复选框只能选择一条记录  
+            clickToSelect: false, //点击行即可选中单选/复选框  
+            checkboxHeader: true
+        });
+    });
+function alert_m(msg){
+                            swal("提示信息", msg, "success");   
+}
+   function update_post(url,data,msg){
+       $.post(url,data,function(data){
+           
+           if(data.stat==1){
+               msg();
+           }else{
+               alert(data.msg);
+           }
+       })
+   } 
+   function confirm_dialog(title,dec,action){
+ swal({
+        title: title,
+        text: dec,
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        cancelButtonText:"取消",
+        confirmButtonText: "确认",
+        closeOnConfirm: false
+    }, function (isConfirm) {
+        if(isConfirm){
+        action();    
+        }
+    });
+       
+   }
+</script>
+<{include file="public/footer"}>

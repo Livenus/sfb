@@ -1,0 +1,173 @@
+﻿<{include file="public/header" /}>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="ibox float-e-margins">
+		<div class="ibox-content">
+			<form class="form-inline" id="theForm" style="display: inline-block;">
+				<div class="form-group">
+					<input type="hidden" name="pid" value="<{$pid}>">
+					<input type="hidden" name="deep" value="<{$deep}>">
+					<label for="area">新增<{$d_name}>地区：</label>
+					<input type="text" placeholder="请输入<{$d_name}>地区名称" id="area" class="form-control" name="a_name">
+				</div>
+			</form>
+			<button class="btn btn-success" id="btn" style="margin: 0;">确定</button>
+		</div>
+		<div class="row show-grid" style="text-align:center;">
+			<{if condition="$deep eq 0"}>[中国]
+			<{else}>[<{$p_areaname}>]
+			<{/if}>
+			<{$d_name}>地区
+		</div>
+		<div class="row show-grid">
+			<{foreach $arealist as $item}>
+			<div class="col-xs-6 col-sm-4"><{$item.a_name}>
+				<span class="link-span" style="padding-left: 10px;margin-left: 15px;border-left: 2px solid #999;">
+					<{if condition="$item.a_deep lt 3"}>
+					<a href="<{:url('area/index',array('a_pid'=>$item.a_id))}>" title="管理">管理</a>&nbsp;&nbsp;
+					<{/if}>
+					<a href="javascript:del(<{$item.a_id}>)" title="删除">删除</a>
+					<a href="<{:url('area/edit',array('a_id'=>$item.a_id))}>)" title="编辑">编辑</a>
+				</span></div>
+			<{/foreach}>
+		</div>
+	</div>
+</div>
+
+
+<script>
+function openwin(item){
+
+	
+	var defaultitem = {title:'',id:''};
+	item = $.extend(defaultitem,item);
+	
+	var url = (!item.id)?"<{:url('area/add')}>":"<{:url('area/edit')}>";
+	
+	$('#win').dialog({
+	    modal:true,
+	    title:'添加/编辑地区',
+	    content:'<form id="ff">' +
+					'<input type="hidden" id="id" value="'+item.id+'"/>'+
+					'<div class="row">'+
+						'<label>地区名称</label>'+
+						'<input value="'+item.title+'" id="title"/>'+
+					'</div><br/>'+
+					'<div class="row">'+
+						'<label>上级地区名称</label>'+
+						'<input value="'+item.title+'" id="ptitle" readonly/>'+
+					'</div><br/>'+
+				'</form>',
+	    width:500,
+	    height:200,
+		buttons:[{
+			text:'保存',
+			iconCls:'icon-ok',
+			handler:function(){
+				$.ajax({
+					url:url,
+					method:'post',
+					dataType:'json',
+					data:{title:$("#title").val(),describe:$("#describe").val(),id:$("#id").val()},
+					success:function(d){
+						if(d.stat == '1'){
+							$('#win').dialog('close');
+							$('#dg').datagrid('reload');
+						}else{
+							$.messager.alert('出错了',d.msg?d.msg:'出错了','error');
+						}
+					},
+					error:function(){
+						$.messager.alert('出错了','服务器出错了，请稍后再试','error');
+					}
+				});
+			}
+		},{
+			text:'取消',
+			handler:function(){
+				$('#win').dialog('close');
+			}
+		}]
+	});
+}
+$(function(){
+	$('#btn').click(function(){
+		$.ajax({
+			url : "<{:url('area/add')}>",
+			data: $('#theForm').serialize(),
+			type : 'post',
+			dataType :'json',
+			success:function(ret){
+				if(ret.stat == '1'){
+					swal({
+						title: "太帅了",
+						text: ret.msg?ret.msg:'添加成功！',
+						type: "success"
+					},function(){
+						location.href="<{:url('area/index',array('a_pid'=>$pid))}>";
+					});
+				}else{
+					swal({
+						title: "出错了",
+						text: ret.msg?ret.msg:'操作失败',
+						type: "error"
+					});
+				}
+			},
+			error:function(err){
+				swal({
+					title: "出错了",
+					text: ret.msg?ret.msg:'网络错误',
+					type: "error"
+				});
+			}
+		});
+	});
+});
+
+function del(id){
+	swal({
+		title: "您确定要删除这条信息吗",
+		text: "删除后将无法恢复，请谨慎操作！",
+		type: "warning",
+		showCancelButton: true,
+		confirmButtonColor: "#DD6B55",
+		confirmButtonText: "删除",
+		closeOnConfirm: false
+	}, function () {
+		$.ajax({
+			url:"<{:url('area/del')}>",
+			type:'post',
+			dataType:'json',
+			data:{a_id:id},
+			success:function(ret){
+				if(ret.stat == '1'){
+					swal({
+						title: "太帅了",
+						text: ret.msg?ret.msg:'删除成功！',
+						type: "success"
+					},function(){
+						location.href="<{:url('area/index',array('a_pid'=>$pid))}>";
+					});
+				}else{
+					swal({
+						title: "出错了",
+						text: ret.msg?ret.msg:'操作失败',
+						type: "error"
+					});
+				}
+			},
+			error:function(err){
+				swal({
+					title: "出错了",
+					text: err.msg?err.msg:'网络错误',
+					type: "error"
+				});
+			}
+		});
+		
+	});
+}
+
+</script>
+
+<{include file="public/footer" /}> 

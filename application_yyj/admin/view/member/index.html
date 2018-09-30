@@ -1,0 +1,490 @@
+<{include file="public/header" }>
+    <script type="text/javascript" charset="utf-8" src="/static/js/plugins/bootstrap-table/bootstrap-table.min.js"></script>
+    <script type="text/javascript" charset="utf-8" src="/static/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js"></script>
+    <link rel="stylesheet" href="/static/css/plugins/bootstraptable/bootstrap-table.min.css">
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title" style=" padding-bottom: 0;">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href="javascript:;">会员列表</a></li>
+                    <li><a class="icon iconfont icon-favor_light" href="<{:url('member/add')}>">新增/修改会员</a></li>
+                </ul>
+            </div>
+            <div class="ibox-content">
+                <div class="row row-lg">
+                    <div class="col-sm-12">
+                        <!-- Example Events -->
+                        <div class="example-wrap">
+                            <div class="example">
+                                <div class="hidden-xs" id="exampleTableEventsToolbar" role="group">
+                                    <button type="button" class="btn btn-sm btn-primary" id="btnadd">
+                                        <i class="glyphicon glyphicon-plus" aria-hidden="true"></i> 添加会员
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-white" id="btndel">
+                                        <i class="glyphicon glyphicon-trash" aria-hidden="true"></i> 删除会员
+                                    </button>
+                                </div>
+                                <!---search start-->
+                                <div class="right">
+                                <form id="search">
+                                <span style=" line-height: 30px; margin-right: 5px;">用户ID</span>
+                                <input type="text" value="" class="input_zdy input-sm" size=25 placeholder="id" name="uid"/> 
+                                <span style=" line-height: 30px; margin-right: 5px;">开始时间</span>
+                                <input type="text" id="start" value="" class="input_zdy input-sm" size=25 placeholder="开始时间" name="start"/>
+                                <span style=" line-height: 30px; margin-right: 5px;">结束时间</span>
+                                <input type="text" id="end" value="" class="input_zdy input-sm" size=25 placeholder="结束时间" name="end"/>
+                                <span style=" line-height: 30px; margin-right: 5px;">会员名称</span>
+                                <input type="text" id="amount" value="" class="input_zdy input-sm" size=15 placeholder="用户名" name="uname"/>
+                                    <span style=" line-height: 30px; margin-right: 5px;">手机号</span>
+                                <input type="text" id="amount" value="" class="input_zdy input-sm" size=15 placeholder="手机号" name="phone"/>
+                                <span style=" line-height: 30px; margin-right: 5px;">实名认证状态</span>
+                                <select name="is_rz_1">
+                                    <option value="-1">全部</option>
+                                    <option value="0">未提交</option>
+                                    <option value="1">通过</option>
+                                    <option value="2" >待审核</option>
+                                    <option value="3">拒绝</option>
+                                </select>
+                                <span style=" line-height: 30px; margin-right: 5px;">图片认证状态</span>
+                                <select name="is_rz_2">
+                                    <option value="-1">全部</option>
+                                    <option value="0">未提交</option>
+                                    <option value="1">通过</option>
+                                    <option value="2" >待审核</option>
+                                    <option value="3">拒绝</option>
+                                </select>
+                                <span style=" line-height: 30px; margin-right: 5px;">状态</span>
+                                <select name="stat">
+                                    <option value="-1">全部</option>
+                                    <option value="0">禁用</option>
+                                    <option value="1">启用</option>
+                                </select>
+                                <a href="javascript:;" id="btnsearch" class="btn btn-primary btn-sm">查询</a>
+                                </form>
+                                </div>
+                                <!---search end---->
+                                <table id="dg" data-mobile-responsive="true">
+                                </table>
+                            </div>
+                        </div>
+                        <!-- End Example Events -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<!-- layerDate plugin javascript -->
+<script src="/static/js/plugins/layer/laydate/laydate.js"></script>
+    <script>
+        var url_index_all="<{:url('member_monylog/all')}>";
+        var url_index_index="<{:url('member_monylog/index')}>";
+        var url_index_order="<{:url('order/index')}>";
+        var url_list="<{:url('member/listajax')}>";
+    var update_url="<{:url('member/update_status')}>";
+     var update_url_s="<{:url('member/update_self_status')}>";
+    function getQueryParams() {
+        var q = {};
+var params = $("#search").serializeArray();
+for (var item in params) {
+   q[params[item].name] = params[item].value;
+}
+        return q;
+    }
+    $("#btnsearch").click(function() {
+        q = getQueryParams();
+        console.log(q);
+        $("#dg").bootstrapTable('refresh', { url: "<{:url('member/listajax')}>", query: q });
+    })
+    $("#btnadd").click(function() {
+        location.href = "<{:url('member/add')}>";
+    })
+
+
+    $("#btndel").click(function() {
+        var items = $("#dg").bootstrapTable('getSelections');
+        items = objcolum(items, 'id');
+        if (items.length <= 0) {
+            swal("出错了", "请选择要删除的值", "error");
+        } else {
+            del(items);
+        }
+    });
+
+    function del(ids) {
+        swal({
+                title: "您确定要删除吗",
+                text: "删除后将无法恢复，请谨慎操作！包含用户的银行卡信息，订单信息一并删除",
+                type: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "确定",
+                cancelButtonText: "取消",
+                closeOnConfirm: false,
+                closeOnCancel: false
+            },
+            function(isConfirm) {
+            	var cur=0;
+
+                if (isConfirm) {
+                    if (!$.isArray(ids)) {
+                        ids = [ids];
+                    }
+                    $.ajax({
+                        url: "<{:url('member/del')}>",
+                        data: { id: ids },
+                        type: 'post',
+                        dataType: 'json',
+                        success: function(d) {
+
+                        	
+                        	init(cur,ids.length,d);
+                            
+                            
+                        }
+                    });
+                    //swal("删除成功！", "您已经永久删除了这条信息。", "success");
+                } else {
+                    swal("已取消", "您取消了删除操作！", "error");
+                }
+            });
+    }
+
+    function init(cur,i,d) {
+
+
+        var percent = parseInt(cur*100/i);
+        var content = '<div class="pull-left"><p id="p_text"><span id="p_text1">'+cur+'</span>/' + i + '</p></div>' +
+            '<div class="progress">' +
+            '   <div class="progress-bar" role="progressbar progress-bar-striped active" aria-valuenow="' + percent + '" aria-valuemin="0" aria-valuemax="100" style="width: ' + percent + '%;min-width: 2em;">' + percent + '%</div>' +
+            '</div>';
+
+        layer.open({type:1,title:'系统提示',content:content,area:['600px','460px'],
+        	success:function(){
+        		var schedule=setInterval(function(){
+        			cur++;
+        			percent = parseInt(cur*100/i);
+        			$("#p_text1").html(cur);
+        			$('.progress').html('<div class="progress-bar" role="progressbar progress-bar-striped active" aria-valuenow="' + percent + '" aria-valuemin="0" aria-valuemax="100" style="width: ' + percent + '%;min-width: 2em;">' + percent + '%</div>')
+        			if(cur>=i){
+        				clearInterval(schedule);
+        				setTimeout(function(){
+        					if (d.stat == '1') {
+                                swal({
+                                    title: "太帅了",
+                                    text: d.msg,
+                                    type: "success"
+                                }, function() {
+                                    location.href = "<{:url('member/index')}>";
+                                });
+                            } else {
+                                swal({
+                                    title: "出错了",
+                                    text: d.msg,
+                                    type: "error"
+                                });
+                            }
+        				},500)
+        				
+        			}
+        		},500)
+        }});
+
+    }
+
+    function changeData(t) {
+        var $form = $("#change_member_data");
+        $.ajax({
+            url: $form.attr('action'),
+            data: $form.serialize(),
+            method: 'post',
+            dataType: 'json',
+            success: function(d) {
+                if (d.stat == '1') {
+                    jf.closedialog(dialog1);
+                    location.href = " <{:url('member/list')}>";
+                } else {
+                    alert(d.msg ? d.msg : '操作失败');
+                    return;
+                }
+            },
+            error: function(d) {
+                alert(d.msg ? d.msg : '操作失败');
+                return;
+            }
+        });
+    }
+
+    function showchange(id, oldData, act) {
+        var title = '';
+        if (act == 'points') {
+            title = '积分';
+        } else if (act == 'exp_points') {
+            title = '经验';
+        }
+        if (title == '' || !id) {
+            alert('参数错误');
+            return;
+        }
+        var content = '<form action="<{:url('
+        member / changeData ')}>" class="form-horizontal form" data-jf="jf_1" id="change_member_data" method="post" onsubmit="return false">' +
+            ' <input name="id" type="hidden" value="' + id + '">' +
+            ' <input name="act" type="hidden" value="' + act + '">' +
+            ' <div class="form-group">' +
+            '  <label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">会员' + title + '值</label>' +
+            '  <div class="col-sm-7 col-lg-8 col-xs-12">' + oldData +
+            '   </div>' +
+            ' </div>' +
+            ' <div class="form-group">' +
+            '  <label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">' + title + '</label>' +
+            '  <div class="col-sm-7 col-lg-8 col-xs-12">' +
+            '   <input class="form-control" name="data" type="text" value=""><span class="help-block">"+"或是纯数字表示增，"-"表示减</span>' +
+            '   </div>' +
+            ' </div>' +
+            ' <div class="form-group">' +
+            '  <label class="col-xs-12 col-sm-2 col-md-2 col-lg-2 control-label">描述</label>' +
+            '  <div class="col-sm-7 col-lg-8 col-xs-12">' +
+            '  <textarea class="form-control" name="desc"></textarea><span class="help-block">描述信息将显示在' + title + '明细相关页，会员和管理员都可见</span>' +
+            '   </div>' +
+            ' </div>' +
+            '</form>';
+        var footer = '<button class="btn btn-primary" onclick="changeData(this)">确认</button>',
+            options = { area: ['600px', '85%'], };
+        dialog1 = jf.dialog('修改' + title, content + footer, options);
+    }
+    $(function() {
+        $('#dg').bootstrapTable({
+            url: "<{:url('member/listajax')}>",
+            //method:'post',
+            queryParams: function(params) {
+                params.p = parseInt(params.offset / params.limit) + 1;
+                params = $.extend(params, getQueryParams());
+                return params;
+            },
+            queryParamsType: "limit",
+            contentType: 'application/json',
+            dataType: 'json',
+            sidePagination: "server", //表示服务端请求
+            pagination: true, //启动分页
+            pageNumber: 1, //当前第几页
+            pageSize: 20, //每页显示的记录数
+            pageList: [10, 15, 20], //记录数可选列表
+            dataField: 'rows',
+            idField: "id",
+            columns: [{ checkbox: true, align: 'center', valign: 'middle' },
+                { title: 'ID', field: 'id', align: 'center', valign: 'middle' },
+                { title: '会员名', field: 'uname', align: 'center', valign: 'middle' },
+                { title: '手机号', field: 'phone', align: 'center', valign: 'middle' },
+                { title: '真实姓名', field: 'truename', align: 'center', valign: 'middle' },
+                { title: '实名认证', field: 'is_rz_1', align: 'center', valign: 'middle' , formatter: function(value, row, index) {
+                         var html="";
+                          if(row.is_rz_1==1){
+                              html="已认证";
+                          }else if(row.is_rz_1==3){
+                               html="已拒绝";
+                          }else if(row.is_rz_1==2){
+                               html="已提交";
+                          }else{
+                              html="未提交";
+                          }
+                          return html;
+                          
+                        
+                }},
+                { title: '图片认证', field: 'is_rz_2', align: 'center', valign: 'middle' , formatter: function(value, row, index) {
+                         var html="";
+                          if(row.is_rz_2==1){
+                              html="已认证";
+                          }else if(row.is_rz_2==3){
+                               html="已拒绝";
+                          }else if(row.is_rz_2==2){
+                               html="已提交";
+                          }else{
+                              html="未提交";
+                          }
+                          return html;
+                          
+                        
+                }},
+                { title: '金额', field: 'money', align: 'center', valign: 'middle' },
+                { title: '刷卡返现', field: 'xj_sk_fy_total', align: 'center', valign: 'middle' }, 
+                { title: '升级返现', field: 'xj_up_fy_total', align: 'center', valign: 'middle' },  
+                { title: '一级人数', field: 'down1_count', align: 'center', valign: 'middle' }, 
+                { title: '二级人数', field: 'down2_count', align: 'center', valign: 'middle' }, 
+                { title: '三级人数', field: 'down3_count', align: 'center', valign: 'middle' }, 
+                { title: '等级', field: 'group', align: 'center', valign: 'middle' },
+                {
+                    title: '注册时间',
+                    field: 'add_time',
+                    align: 'center',
+                    valign: 'middle'
+                },
+                { title: '注册IP', field: 'reg_ip', align: 'center', valign: 'middle' },
+                {
+                    title: '启用',
+                    field: 'stat',
+                    align: 'center',
+                    valign: 'middle',
+                    formatter: function(value, row, index) {
+                        var html="";
+                        if (row.stat == '1') {
+                            html = '<i class="fa fa-toggle-on infoOn upstatus" data-status='+0+' data-id='+row.id +'></i>';
+                        } else {
+                            html = '<i class="fa fa-toggle-on infoOff upstatus" data-status='+1+' data-id='+row.id +'></i>';
+                        }
+                        return html;
+                    }
+                },
+                { title: '订单记录', field: 'is_rz_1', align: 'center', valign: 'middle' , formatter: function(value, row, index) {
+                         var html=""+"<a href='"+url_index_all+"?uid="+row.id+"'>流水</a></br><a href='"+url_index_index+"?uid="+row.id+"'>分润</a></br><a href='"+url_index_order+"?uid="+row.id+"'>缴费记录</a>";
+                          return html;
+                          
+                        
+                }},
+                { title: '会员统计查询', field: 'is_rz_1', align: 'center', valign: 'middle' , formatter: function(value, row, index) {
+                         var html=""+"<a href='' data-id="+row.id+"  data-level=1 class='level'>一代会员</a></br><a href='' data-id="+row.id+"  data-level=2 class='level'>二代会员</a></br><a href='' data-id="+row.id+"  data-level=3 class='level'>三代会员</a>";
+                          return html;
+                          
+                        
+                }},
+                {
+                    title: '操作',
+                    field: 'n_do',
+                    align: 'center',
+                    valign: 'middle',
+                    formatter: function(value, row, index) {
+                        var html = '';
+                        html = '\
+                <a href="<{:url(\'member/edit\')}>?uid=' + row.id + '" class="btn btn-warning btn-sm" data-toggle="tooltip" data-placement="top" title="编辑" style=" margin-right:4px;"><span class="glyphicon glyphicon-edit"></span> 编辑</a>\n\
+\n\                <a href="<{:url(\'member/detail\')}>?id=' + row.id + '" class="btn btn-warning btn-sm" data-toggle="tooltip" data-placement="top" title="查看" style=" margin-right:4px;"><span class="glyphicon glyphicon-edit"></span> 查看</a>\n\
+                <a href="javascript:;" onclick=""  data-id='+row.id+' pid_count='+row.pid_count+' class="btn btn-warning btn-sm del" data-toggle="tooltip" data-placement="top" title="删除" style=" margin-right:4px;"><span class="glyphicon glyphicon-remove"></span> 删除</a>\n\
+';
+                        return html;
+                    }
+                }
+            ],
+            responseHandler: function(res) {
+                //远程数据加载之前,处理程序响应数据格式,对象包含的参数: 我们可以对返回的数据格式进行处理
+                //在ajax后我们可以在这里进行一些事件的处理
+                return res;
+            },
+            search: false,
+            iconSize: 'outline',
+            toolbar: '#exampleTableEventsToolbar',
+            icons: {
+                refresh: 'glyphicon-repeat',
+                toggle: 'glyphicon-list-alt',
+                columns: 'glyphicon-list'
+            },
+            toolbarAlign: 'left',
+            showToggle: false,
+            showColumns: false, //显示下拉框勾选要显示的列
+            minimumCountColumns: 3,
+            showRefresh: true, //显示刷新按钮
+            striped: true, //表格显示条纹
+            singleSelect: false, //复选框只能选择一条记录  
+            clickToSelect: false, //点击行即可选中单选/复选框  
+            checkboxHeader: true
+        });
+    var start = {
+        elem: "#start",
+        format: "YYYY-MM-DD hh:mm:ss",
+        min: "2018-01-0 23:59:59",
+        max: "2099-06-16 23:59:59",
+        istime: true,
+        istoday: false,
+        choose: function (datas) {
+            end.min = datas;
+            end.start = datas
+        }
+    };
+    var end = {
+        elem: "#end",
+        format: "YYYY-MM-DD hh:mm:ss",
+        min: "2018-01-0 23:59:59",
+        max: "2099-06-16 23:59:59",
+        istime: true,
+        istoday: false,
+        choose: function (datas) {
+            start.max = datas
+        }
+    };
+    laydate(start);
+    laydate(end);
+  $("body").on("click",".level",function(e){
+      e.preventDefault();
+      var member_id=$(this).attr("data-id");
+      var level=$(this).attr("data-level");
+      var q={member_id:member_id,level:level};
+       $("#dg").bootstrapTable('refresh', { url: url_list, query: q });
+  })
+  
+        function alert_m(msg){
+                            swal("提示信息", msg, "success");   
+}
+   function update_post(url,data,msg){
+       $.post(url,data,function(data){
+           
+           if(data.stat==1){
+               msg();
+           }else{
+               alert(data.msg);
+           }
+       })
+   } 
+   function confirm_dialog(title,dec,action){
+ swal({
+        title: title,
+        text: dec,
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        cancelButtonText:"取消",
+        confirmButtonText: "确认",
+        closeOnConfirm: false
+    }, function (isConfirm) {
+        if(isConfirm){
+        action();    
+        }
+    });
+       
+   }
+   $("body").on("click",".upstatus",function(e){
+        e.preventDefault();
+        var status=$(this).attr("data-status");
+
+         var id=$(this).attr("data-id");
+       var data={id:id,status:status};
+       var url=update_url_s;
+         if(status==1){
+             var msg="确认启用此会员";
+         }else{
+             var msg="确认屏蔽此会员";   
+         };
+confirm_dialog("确认提示",msg,function(){
+
+        if(id){
+            
+            update_post(url,data,function(){
+                        swal("操作成功！", msg, "success");   
+                        $("#dg").bootstrapTable("refresh");
+            });
+        }
+
+    
+});
+    })
+   $("body").on("click",".del",function(e){
+        e.preventDefault();
+        var pid_count=$(this).attr("pid_count");
+        if(Number(pid_count)>0){
+            alert("已有子请删除下级");
+             return false;
+        }else{
+                    var id=$(this).attr("data-id");
+            del(id);
+        }
+
+    })
+    });
+    </script>
+    <{include file="public/footer" }>

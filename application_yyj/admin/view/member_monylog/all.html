@@ -1,0 +1,317 @@
+<{include file="public/header"}>
+<script type="text/javascript" charset="utf-8" src="/static/js/plugins/bootstrap-table/bootstrap-table.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="/static/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js"></script>
+<link rel="stylesheet" href="/static/css/plugins/bootstraptable/bootstrap-table.min.css">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="ibox float-e-margins">
+        <div class="ibox-title" style=" padding-bottom: 0;">
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="javascript:;">报表</a></li>
+            </ul>
+        </div>
+        <div class="ibox-content">
+
+            <div class="row row-lg">
+                <div class="col-sm-12">
+                    <!-- Example Events -->
+                    <div class="example-wrap">
+                        <div class="example">
+                            <div class="hidden-xs" id="exampleTableEventsToolbar" role="group">
+                            </div>
+                            <!---search start-->
+                            <div class="right">
+                                <form id="search">
+                                <span style=" line-height: 30px; margin-right: 5px;">开始时间</span>
+                                <input type="text" id="start" value="" class="input_zdy input-sm" size=25 placeholder="开始时间" name="start"/>
+                                <input name="self_type" type="hidden" value="15">
+                                <span style=" line-height: 30px; margin-right: 5px;">结束时间</span>
+                                <input type="text" id="end" value="" class="input_zdy input-sm" size=25 placeholder="结束时间" name="end"/>
+                                <span style=" line-height: 30px; margin-right: 5px;">支付方式</span>   
+                                <select name="pay_type" class="type">
+                                                <option value="0"  >选择支付方式</option> 
+                                               <{volist name="unionpay"  id="v"}>
+                                               <option value="<{$v.id}>" <{if condition="$info.type eq $v['id']"}>selected<{/if}>><{$v.name}></option>
+                                                 <{/volist}>
+                                </select>
+                                <span style=" line-height: 30px; margin-right: 5px;">支付通道</span>   
+                                <select name="pay_type_way" class="pay_type">
+                                    <option value="0"  >选择支付通道</option> 
+                                               <{volist name="unionpay"  id="v"}>
+                                                  <{volist name="v.pay_way"  id="vv"}>
+                                               <option value="<{$vv.type}>" class="<{$v.id}>" ><{$vv.name}></option>
+                                                    <{/volist}>
+                                                 <{/volist}>
+                                </select>
+                                <span style=" line-height: 30px; margin-right: 5px;">支付类型</span>   
+                                <select name="type">
+                            <option value="0"  >支付类型</option> 
+                               <option value="1"  >升级</option>
+                                <option value="2"  >刷卡</option>
+                                </select>
+                                <span style=" line-height: 30px; margin-right: 5px;">用户名</span>
+                                <input type="text" id="amount" value="" class="input_zdy input-sm" size=15 placeholder="用户名" name="get_user"/>
+                                <input type="hidden"  value="<{$input['uid']}>" class="input_zdy input-sm" size=15 placeholder="用户名" name="uid"/>
+                                    <span style=" line-height: 30px; margin-right: 5px;">上级用户名</span>
+                                <input type="text" id="amount" value="" class="input_zdy input-sm" size=15 placeholder="用户名" name="from_user"/>
+                                <span style=" line-height: 30px; margin-right: 5px;">订单编号:</span>
+                                <input type="text" id="a_name" value="" class="input_zdy input-sm" size=15 placeholder="订单号" name="a_name"/>
+                                <a href="javascript:;" id="btnsearch" class="btn btn-primary btn-sm">查询</a>
+                                </form>
+                            </div>
+                            <!---search end---->
+                            <table id="dg" data-mobile-responsive="true">
+                            </table>
+                        </div>
+                    </div>
+                    <!-- End Example Events -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- layerDate plugin javascript -->
+<script src="/static/js/plugins/layer/laydate/laydate.js"></script>
+<script>
+    var url_index="<{:url('MemberMonylog/listajax')}>";
+    var update_edit = "<{:url('MemberMonylog/edit')}>";
+    var url_del = "<{:url('MemberMonylog/del')}>";
+    $("#btnsearch").click(function () {
+        q = getQueryParams();
+        var url=url_index;
+        $("#dg").bootstrapTable('refresh', {url: url, query: q});
+    })
+    function getQueryParams() {
+        var q = {};
+var params = $("#search").serializeArray();
+for (var item in params) {
+   q[params[item].name] = params[item].value;
+}
+        return q;
+    }
+
+    $(function () {
+        $('#dg').bootstrapTable({
+            url:url_index,
+            //method:'post',
+            queryParams: function (params) {
+                params.p = parseInt(params.offset / params.limit) + 1;
+                params = $.extend(params, getQueryParams());
+                return params;
+            },
+            queryParamsType: "limit",
+            contentType: 'application/json',
+            dataType: 'json',
+            sidePagination: "server", //表示服务端请求
+            pagination: true, //启动分页
+            pageNumber: 1, //当前第几页
+            pageSize: 10, //每页显示的记录数
+            pageList: [10, 15, 20], //记录数可选列表
+            dataField: 'rows',
+            idField: "id",
+            columns: [{checkbox: true, align: 'center', valign: 'middle'},
+                {title: 'id', field: 'id', align: 'center', valign: 'middle'},
+                {title: '会员名称', field: 'member.uname', align: 'center', valign: 'middle'},
+                {title: '手机号', field: 'member.phone', align: 'center', valign: 'middle'},
+                {title: '上级会员', field: 'memfrom.uname', align: 'center', valign: 'middle'},
+                {title: '手机号', field: 'memfrom.phone', align: 'center', valign: 'middle'},
+                {title: '金额(元)', field: 'val', align: 'center', valign: 'middle'},
+                {title: '第三方订单号', field: 'outer_sn', align: 'center', valign: 'middle',formatter: function (value, row, index) {
+                        var html = '--';
+                        if(row.outer_sn==null){
+                            
+                        }else{
+                            console.log(row.outer_sn);
+                              html="<a href='javascript:;' title='"+row.type_ordersn+"'>"+row.outer_sn+"</a>";
+                        }
+                        return html; 
+                        
+                        
+                }},
+                {title: '支付方式', field: 'val', align: 'center', valign: 'middle', formatter: function (value, row, index) {
+                        var html = '';
+                        if(typeof row.channel =="object"){
+                            html=row.channel.name;
+                        }else{
+                            html="";     
+                        }
+                        return html;
+                        
+                }},
+                {title: '通道', field: 'val', align: 'center', valign: 'middle', formatter: function (value, row, index) {
+                        var html = '';
+                        if(typeof row.channeld =="object"){
+                            html=row.channeld.name;
+                        }else{
+                            html="";     
+                        }
+                        return html;
+                        
+                }},
+                {title: '添加时间', field: 'add_time', align: 'center', valign: 'middle'},
+                {title: '类别', field: 'type', align: 'center', valign: 'middle', formatter: function (value, row, index) {
+                        var html = '';
+                        if(row.type==1){
+                            html="刷卡返现";
+                        }else if(row.type==2){
+                            html="升级返现";     
+                        }else if(row.type==3){
+                            html="提现";     
+                        }else if(row.type==4){
+                            html="刷卡";     
+                        }else if(row.type==5){
+                            html="升级";     
+                        }
+                        return html;
+                        
+                }},
+                {title: '状态', field: 'status', align: 'center', valign: 'middle',formatter: function (value, row, index) {
+                        var html = '';
+                        if(row.type==1){
+                            html="已付";
+                        }else if(row.type==2){
+                            html="已付";     
+                        }else if(row.type==3){
+                            if(row.stat==1){
+                              html="已付";       
+                            }else{
+                             html="未付";     
+                            }
+                            
+                        }else if(row.type==4){
+                            html="已付";     
+                        }else if(row.type==5){
+                            html="已付";     
+                        }
+                        return html;
+                        
+                        
+                        
+                }},
+                ],
+            responseHandler: function (res) {
+                //远程数据加载之前,处理程序响应数据格式,对象包含的参数: 我们可以对返回的数据格式进行处理
+                //在ajax后我们可以在这里进行一些事件的处理
+                return res;
+            },
+            search: false,
+            iconSize: 'outline',
+            toolbar: '#exampleTableEventsToolbar',
+            icons: {
+                refresh: 'glyphicon-repeat',
+                toggle: 'glyphicon-list-alt',
+                columns: 'glyphicon-list'
+            },
+            toolbarAlign: 'left',
+            showToggle: false,
+            showColumns: false, //显示下拉框勾选要显示的列
+            // minimumCountColumns:3,
+             showRefresh:true,//显示刷新按钮
+            striped: true, //表格显示条纹
+            singleSelect: false, //复选框只能选择一条记录  
+            clickToSelect: false, //点击行即可选中单选/复选框  
+            checkboxHeader: true
+        });
+    $("body").on("click",".detail",function(e){
+        e.preventDefault();
+                 var id=$(this).attr("data-id");
+        location.href=update_edit+"?id="+id+"&disable=1";
+    }) 
+    $("body").on("click",".action_del",function(e){
+        e.preventDefault();
+         var id=$(this).attr("data-id");
+         confirm_dialog("提示","删除当前订单",function(){
+             var url=url_del;
+             var data={id:id};          
+             update_post(url,data,function(){
+                 
+                  $("#dg").bootstrapTable('refresh');
+                 alert_m("删除成功");
+             });
+         })
+    }) 
+    $("body").on("click","#btndel",function(e){
+        e.preventDefault();
+         var items=$('#dg').bootstrapTable('getSelections');
+        items = objcolum(items, 'id');
+         confirm_dialog("提示","删除当前订单",function(){
+             var url=url_del;
+             var data={id:items};          
+             update_post(url,data,function(){
+                 
+                  $("#dg").bootstrapTable('refresh');
+                 alert_m("删除成功");
+             });
+         })
+    }) 
+    var start = {
+        elem: "#start",
+        format: "YYYY-MM-DD hh:mm:ss",
+        min: "2018-01-0 23:59:59",
+        max: "2099-06-16 23:59:59",
+        istime: true,
+        istoday: false,
+        choose: function (datas) {
+            end.min = datas;
+            end.start = datas
+        }
+    };
+    var end = {
+        elem: "#end",
+        format: "YYYY-MM-DD hh:mm:ss",
+        min: "2018-01-0 23:59:59",
+        max: "2099-06-16 23:59:59",
+        istime: true,
+        istoday: false,
+        choose: function (datas) {
+            start.max = datas
+        }
+    };
+    laydate(start);
+    laydate(end);
+    //选择通道
+        var pay_types=$(".pay_type option");
+        $(".pay_type").empty();
+        $(".type").change(function(){
+            var id=$(this).val();
+            $(".pay_type").empty();
+            var str="";
+            for(var i=0;i<pay_types.length;i++){
+                if(pay_types.eq(i).hasClass(id)){
+                                   $(".pay_type").append(pay_types[i]);
+                }
+
+            }
+        })
+    });
+function alert_m(msg){
+                            swal("提示信息", msg, "success");   
+}
+   function update_post(url,data,msg){
+       $.post(url,data,function(data){
+           
+           if(data.stat==1){
+               msg();
+           }else{
+               alert(data.msg);
+           }
+       })
+   } 
+   function confirm_dialog(title,dec,action){
+ swal({
+        title: title,
+        text: dec,
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        cancelButtonText:"取消",
+        confirmButtonText: "确认",
+        closeOnConfirm: false
+    }, function (isConfirm) {
+        if(isConfirm){
+        action();    
+        }
+    });
+       
+   }
+</script>
+<{include file="public/footer"}>

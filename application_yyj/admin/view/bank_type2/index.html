@@ -1,0 +1,184 @@
+<{include file="public/header"}>
+<script type="text/javascript" charset="utf-8" src="/static/js/plugins/bootstrap-table/bootstrap-table.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="/static/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js"></script>
+<link rel="stylesheet" href="/static/css/plugins/bootstraptable/bootstrap-table.min.css">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="ibox float-e-margins">
+        <div class="ibox-title" style=" padding-bottom: 0;">
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="javascript:;">银行管理</a></li>
+            </ul>
+        </div>
+        <div class="ibox-content">
+                                <div class="hidden-xs" id="exampleTableEventsToolbar" role="group">
+                                    <button type="button" class="btn btn-sm btn-primary" id="btnadd">
+                                        <i class="glyphicon glyphicon-plus" aria-hidden="true"></i> 添加
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-white" id="btnsorts">
+                                        <i class="glyphicon glyphicon-edit" aria-hidden="true"></i> 更新排序
+                                    </button>
+                                </div>
+            <div class="row row-lg">
+                <div class="col-sm-12">
+                    <!-- Example Events -->
+                    <div class="example-wrap">
+                        <div class="example">
+                            <div class="hidden-xs" id="exampleTableEventsToolbar" role="group">
+                            </div>
+                            <!---search start-->
+                            <div class="right">
+                                <form id="search">
+                                <span style=" line-height: 30px; margin-right: 5px;">名称</span>
+                                <input type="text" id="start" value="" name='bank_name' class="input_zdy input-sm" size=25 placeholder="名称" />
+                                <a href="javascript:;" id="btnsearch" class="btn btn-primary btn-sm">查询</a>
+                                </form>
+                            </div>
+                            <!---search end---->
+                            <table id="dg" data-mobile-responsive="true">
+                            </table>
+                        </div>
+                    </div>
+                    <!-- End Example Events -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- layerDate plugin javascript -->
+<script src="/static/js/plugins/layer/laydate/laydate.js"></script>
+<script>
+    var url_index="<{:url('bankType2/listajax')}>";
+    var url_update="<{:url('bankType2/update')}>";
+    var update_add = "<{:url('bankType2/add')}>";
+   var update_edit = "<{:url('bankType2/edit')}>";
+    var url_del = "<{:url('msg/del')}>";
+    $("#btnsearch").click(function () {
+        q = getQueryParams();
+        var url=url_index;
+        $("#dg").bootstrapTable('refresh', {url: url, query: q});
+    })
+    function getQueryParams() {
+        var q = {};
+var params = $("#search").serializeArray();
+for (var item in params) {
+   q[params[item].name] = params[item].value;
+}
+        return q;
+    }
+
+    $(function () {
+        $('#dg').bootstrapTable({
+            url:url_index,
+            //method:'post',
+            queryParams: function (params) {
+                params.p = parseInt(params.offset / params.limit) + 1;
+                params = $.extend(params, getQueryParams());
+                return params;
+            },
+            queryParamsType: "limit",
+            contentType: 'application/json',
+            dataType: 'json',
+            sidePagination: "server", //表示服务端请求
+            pagination: true, //启动分页
+            pageNumber: 1, //当前第几页
+            pageSize: 10, //每页显示的记录数
+            pageList: [10, 15, 20], //记录数可选列表
+            dataField: 'rows',
+            idField: "id",
+            columns: [{checkbox: true, align: 'center', valign: 'middle'},
+                {title: '银行名称', field: 'bank_name', align: 'center', valign: 'middle'},
+                {title: '排序', field: 'sorts', align: 'center', valign: 'middle', formatter: function (value, row, index) {
+                        var html = '';
+                        html='<input type="text" class="sorts" name="'+row.bank_name+'" value='+value+'>';
+                        
+                        return html;
+                }},
+                {title: '状态', field: 'status', align: 'center', valign: 'middle',                    formatter: function (value, row, index) {
+                         var html = '';
+                        if(value==1){
+                            html="启用";
+                        }else{
+                             html="关闭";
+                        }
+                        return html;
+                }
+        },
+                {
+                    title: '操作',
+                    field: 'n_do',
+                    align: 'center',
+                    valign: 'middle',
+                    formatter: function(value, row, index) {
+                        var html = '';
+                        html = '\
+                <a href="'+update_edit+'?bank_no=' + row.bank_no + '" class="btn btn-warning btn-sm" data-toggle="tooltip" data-placement="top" title="编辑" style=" margin-right:4px;"><span class="glyphicon glyphicon-edit"></span> 编辑</a>\n\
+';
+                        return html;
+                    }}
+              ],
+            responseHandler: function (res) {
+                //远程数据加载之前,处理程序响应数据格式,对象包含的参数: 我们可以对返回的数据格式进行处理
+                //在ajax后我们可以在这里进行一些事件的处理
+                return res;
+            },
+            search: false,
+            iconSize: 'outline',
+            toolbar: '#exampleTableEventsToolbar',
+            icons: {
+                refresh: 'glyphicon-repeat',
+                toggle: 'glyphicon-list-alt',
+                columns: 'glyphicon-list'
+            },
+            toolbarAlign: 'left',
+            showToggle: false,
+            showColumns: false, //显示下拉框勾选要显示的列
+            // minimumCountColumns:3,
+            // showRefresh:true,//显示刷新按钮
+            striped: true, //表格显示条纹
+            singleSelect: false, //复选框只能选择一条记录  
+            clickToSelect: false, //点击行即可选中单选/复选框  
+            checkboxHeader: true
+        });
+function alert_m(msg){
+                            swal("提示信息", msg, "success");   
+}
+   function update_post(url,data,msg){
+       $.post(url,data,function(data){
+           
+           if(data.stat==1){
+               msg();
+           }else{
+               alert(data.msg);
+           }
+       })
+   } 
+   function confirm_dialog(title,dec,action){
+ swal({
+        title: title,
+        text: dec,
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        cancelButtonText:"取消",
+        confirmButtonText: "确认",
+        closeOnConfirm: false
+    }, function (isConfirm) {
+        if(isConfirm){
+        action();    
+        }
+    });
+       
+   }
+    $("#btnadd").click(function() {
+        location.href = update_add;
+    })
+   $("#btnsorts").click(function(){
+       var sorts=$(".sorts").serialize();
+       
+       update_post(url_update,sorts,function(){
+           location.reload();
+       })
+   })
+    })
+</script>
+<{include file="public/footer"}>

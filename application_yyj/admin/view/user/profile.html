@@ -1,0 +1,121 @@
+<{include file="public/header"}>
+<link type="text/css" rel="stylesheet" href="/static/css/plugins/iCheck/custom.css">
+<script type="text/javascript" charset="utf-8" src="/static/js/plugins/iCheck/icheck.min.js"></script>
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="tabs-container ibox-title">
+					<ul class="nav nav-tabs">
+						<li class="active"><a href="javascript:;">个人信息</a></li>
+					</ul>
+                    <div class="ibox-content">
+                    	<div class="">
+	                    <form class="form-horizontal" id="signupForm" onclick="return false">
+							<input type="hidden" name="id" value="<{$item['adminid']}>">
+    						<div class="">
+    							<div class="form-group ">
+                                    <div class="col-sm-2 control-label">用户名</div>
+                                    <div class="col-sm-4">
+                                        <input id="username" type="text" class="form-control" value="<{$item['username']}>" name="username" readonly>
+                                        <span class="help-block m-b-none"></span>
+                                    </div>
+                                </div>  
+								
+								<div class="form-group ">
+                                    <div class="col-sm-2 control-label">旧密码</div>
+                                    <div class="col-sm-4">
+                                        <input id="" type="password" class="form-control" value="" name="opass">
+                                        <span class="help-block m-b-none"></span>
+                                    </div>
+                                </div> 
+								<div class="form-group ">
+                                    <div class="col-sm-2 control-label">新密码</div>
+                                    <div class="col-sm-4">
+                                        <input id="" type="password" class="form-control" value="" name="npass">
+                                        <span class="help-block m-b-none"></span>
+                                    </div>
+                                </div> 
+								<div class="form-group ">
+                                    <div class="col-sm-2 control-label">确认密码</div>
+                                    <div class="col-sm-4">
+                                        <input id="" name="confirm_password" type="password" class="form-control" value="">
+                                        <span class="help-block m-b-none"></span>
+                                    </div>
+                                </div> 
+								
+								
+								<div class="form-group class_photo" style="">
+									<label class="col-sm-2 control-label">真实姓名</label>
+									<div class="col-sm-4">
+										<input id="realname" type="text" class="form-control" value="<{$item['realname']}>" name="realname">
+										<span class="help-block m-b-none"></span>
+									</div>
+								</div>
+								
+								<div class="form-group ">
+                                    <div class="col-sm-2 control-label">权限组</div>
+                                    <div class="col-sm-4">
+                                        <select id="ap_id" class="input_zdy input-sm" name="group_id" disabled>
+											<option value="0">权限组</option>
+											<{foreach name="group" item="v"}>
+											<option value="<{$v.id}>" <{if condition="$v['id']==$item['group_id']"}> selected<{/if}>><{$v.title}></option>
+											<{/foreach}>
+										</select>
+                                    </div>
+                                </div> 
+					            <div class="form-group">
+		                            <div class="col-sm-4 col-sm-offset-2">
+		                                <a href="javascript:;" id="submit" class="btn btn-warning btnbottom">立即保存</a>
+		                            </div>
+		                        </div>
+    						</div>
+        				</form>
+        				</div>
+	                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+	<!-- jQuery Validation plugin javascript-->
+    <script src="/static/js/plugins/validate/jquery.validate.min.js"></script>
+    <script src="/static/js/plugins/validate/messages_zh.min.js"></script>
+
+    <script src="/static/js/form-validate.js"></script>
+    <script>
+	$(function(){
+		$("#submit").click(function (){
+			var $form = $("#signupForm");
+			$.ajax({
+				url:"<{php}>echo url('user/profile')<{/php}>",
+				data:$form.serialize(),
+				type:'post',
+				dataType:'json',
+				success:function(d){
+					if(d.stat == '1'){
+						swal({
+							title: "太帅了",
+							text: d.msg?d.msg:'操作成功！',
+							type: "success"
+						},function(){
+							location.href="<{:url('user/profile')}>";
+						});
+					}else{
+						swal({
+							title: "出错了",
+							text: d.msg?d.msg:'操作失败',
+							type: "error"
+						});
+					}
+				},
+				error:function(d){
+					swal({
+						title: "出错了",
+						text: d.msg?d.msg:'操作失败',
+						type: "error"
+					});
+				}
+			});
+		});
+	});
+    </script>
+<{include file="public/footer"}>

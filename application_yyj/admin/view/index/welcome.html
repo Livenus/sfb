@@ -1,0 +1,161 @@
+<{include file="public/header"}>
+<style>
+a{
+	color: #fff;
+}
+	.set_row{
+		display: flex;
+		display: -webkit-flex;
+		display: -ms-flex;
+		display: -moz-flex;
+		margin: 10px 0;
+	
+	}
+	.set_box{
+		position: absolute;
+		top: 50%;
+		left:50%;
+		/*margin-top: -195px;*/
+    margin-top: -215px;
+    margin-left: -520px;
+	}
+	.set_row>.ibx{
+		width: 250px;
+		height: 130px;
+		padding: 5px;
+		margin:0 5px;
+		background: #fff;
+		display: flex;
+		display: -webkit-flex;
+		display: -ms-flex;
+		display: -moz-flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+	.set_row>.ibx div{
+		font-size: 18px;color: #000;
+		text-align: left;
+		
+	}
+	.set_row>.ibx div p{
+		color: #d31e1e;font-size: 23px;
+		margin: 0;
+	}
+	.set_row>.ibx:nth-child(2){
+		background:#d7e0f3;
+	}
+	.set_row>.ibx:nth-child(4){
+		background:#d7e0f3;
+	}
+</style>
+<body style="background: url(/static/images/index_bg.png) no-repeat; background-size: 100% 100%; min-height: 700px; min-width: 1100px; overflow-x: hidden; ">
+	<div style="margin:auto,50%;text-align: center; font-size: 30px; font-weight: 600; color: #fff; position: absolute;top:50%;left:50%;margin-left:-90px; margin-top: -270px; ">
+		后台管理系统
+	</div>
+	<div style="margin:auto,50%;text-align: center;">
+           <div style="width:1040px;" class="set_box">
+           	<span style="color: #000"> 数据图表统计：</span>
+            <a href="<{:url('index/user_money')}>">会员总余额</a>
+            <a href="<{:url('index/user_cash',['type'=>1])}>">刷卡总金额</a>
+           <a href="<{:url('index/user_cash',['type'=>2])}>">升级总金额</a>
+          <a href="<{:url('index/user_back')}>">总分润</a>
+          <a href="<{:url('index/user_more')}>">当日新增会员数</a>
+          <a href="<{:url('index/user_more_g')}>">每日各级别会员数</a>
+           	 <div class="set_row">
+           	 	<div class="ibx">
+           	 		<div>     
+           	 			<p><{$sum_member_money}></p>
+           	 			会员总余额(元)
+           	 		</div>
+           	 		<img src="/static/images/icon01.png" alt="">
+           	 	</div>
+           	 	<div class="ibx">
+           	 		<div>
+           	 			<p><{$sum_type1}></p>
+           	 			刷卡总金额(元)
+           	 		</div>
+           	 		<img src="/static/images/icon02.png" alt="">
+           	 	</div>
+           	 	<div class="ibx">
+           	 		<div>
+           	 			<p><{$sum_type2}></p>
+           	 			升级总金额(元)
+           	 		</div>
+           	 		<img src="/static/images/icon03.png" alt="">
+           	 	</div>
+           	 	<div class="ibx">
+           	 		<div>
+           	 			<p><{$back}></p>
+           	 			总分润(元)
+           	 		</div>
+           	 		<img src="/static/images/icon04.png" alt="">
+           	 	</div>
+           	 </div>
+           	 <div class="set_row">
+           	 	<div class="ibx">
+           	 		<div>
+           	 			<p><{$member_day}></p>
+           	 			当日新增会员数(人)
+           	 		</div>
+           	 		<img src="/static/images/icon05.png" alt="">
+           	 	</div>
+           	 	<div class="ibx">
+           	 		<div>
+           	 			<p><{$members}></p>
+           	 			会员(人)
+           	 		</div>
+           	 		<img src="/static/images/icon06.png" alt="">
+           	 	</div>
+           	 	<div class="ibx">
+           	 		<div>
+           	 			<p><{$admins}></p>
+           	 			管理员(人)
+           	 		</div>
+           	 		<img src="/static/images/icon07.png" alt="">
+           	 	</div>
+           	 	<div class="ibx">
+           	 		<div>
+           	 			<p><{$sum_day}></p>
+           	 			当日流水(元)
+           	 		</div>
+           	 		<img src="/static/images/icon08.png" alt="">
+           	 	</div>
+           	 </div>
+           	 <div class="set_row">
+           	 	<div class="ibx">
+           	 		<div>
+           	 			<p><{$sum_month}></p>
+           	 			当月流水(元)
+           	 		</div>
+           	 		<img src="/static/images/icon09.png" alt="">
+           	 	</div>
+           	 	<div class="ibx">
+           	 		<div>
+           	 			<p><{$sum}></p>
+           	 			充值总金额(元)
+           	 		</div>
+           	 		<img src="/static/images/icon10.png" alt="">
+           	 	</div>
+           	 	<div class="ibx">
+           	 		<div>
+           	 			<p><{$order}></p>
+           	 			订单数(个)
+           	 		</div>
+           	 		<img src="/static/images/icon11.png" alt="">
+           	 	</div>
+           	 	<div class="ibx">
+                <div>
+                  <p><{$backcount['num']}></p>
+                  银行四要素验证次数(本月:<{$backcount['bnum']}>条&nbsp;上月:<{$backcount['snum']}>条&nbsp;<{$backcount['ymday']}>月:<{$backcount['stnum']}>条)
+                </div>
+                <img src="/static/images/icon11.png" alt="">
+              </div>
+           	 </div>
+           </div>
+        
+        
+        
+        
+        
+        </div>
+<{include file="public/footer"}>

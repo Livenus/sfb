@@ -1,0 +1,387 @@
+<{include file="public/header" }>
+    <link type="text/css" rel="stylesheet" href="/static/css/plugins/iCheck/custom.css">
+	<link rel="stylesheet" type="text/css" href="/static/css/plugins/webuploader/webuploader.css">
+    <link rel="stylesheet" type="text/css" href="/static/css/webuploader-demo.css">
+    <style>
+    	 body {
+        background: #f3f3f4;
+    }
+    .col-sm-4 .form-control{
+        
+        width:90%;
+    }
+    .col-sm-4 .form-control,.help-block{
+        
+        display:inline-block;
+    }
+    </style>
+    <script type="text/javascript" charset="utf-8" src="/static/js/plugins/iCheck/icheck.min.js"></script>
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="tabs-container ibox-title">
+                    <ul class="nav nav-tabs ">
+                            <li class="active"><a href="javascript:;">系统设置</a></li>
+
+                    </ul>
+                    <div class="ibox-content">
+                        <div class="">
+                            <form class="form-horizontal" id="form1" onclick="return false">
+                                <div class="">
+   
+                                    <div class="form-group ">
+                                        <div class="col-sm-2 control-label">默认用户组</div>
+                                        <div class="col-sm-4">
+                                           <select name="member_group" class="form-control">
+                                               <{volist name="group" id="v"}>
+                                               <option value="<{$v.id}>" <{if condition="$v['id'] eq $rate['member_group']"}>selected="selected"<{/if}>><{$v.name}></option>
+                                                 <{/volist}>  
+                                            </select>
+                                            <span class="help-block m-b-none"></span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group ">
+                                        <div class="col-sm-2 control-label">显示升级提示</div>
+                                        <div class="col-sm-4">
+                                             <select name="display_up"  class="form-control">
+                                                 <option value="0" <{$rate['display_up']?"":"selected"}>> 关闭</option>
+                                                 <option value="1" <{$rate['display_up']?"selected":""}>> 打开</option>
+                                             </select>
+                                            <span class="help-block m-b-none"></span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group ">
+                                        <div class="col-sm-2 control-label">省代下级刷卡返佣比例</div>
+                                        <div class="col-sm-4">
+                                            <input name="pro_back_cash" type="number"  min="0.01" max="60"value="<{$rate['pro_back_cash']}>" class="form-control"/>
+                                            <span class="help-block m-b-none">%</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group ">
+                                        <div class="col-sm-2 control-label">省代下级升级返佣比例</div>
+                                        <div class="col-sm-4">
+                                            <input name="pro_back_up" type="number"  min="0.01" max="60"value="<{$rate['pro_back_up']}>" class="form-control"/>
+                                            <span class="help-block m-b-none">%</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group ">
+                                        <div class="col-sm-2 control-label">市下级刷卡返佣比例</div>
+                                        <div class="col-sm-4">
+                                            <input name="city_back_cash" type="number"  min="0.01" max="60"value="<{$rate['city_back_cash']}>" class="form-control"/>
+                                            <span class="help-block m-b-none">%</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group ">
+                                        <div class="col-sm-2 control-label">市下级升级返佣比例</div>
+                                        <div class="col-sm-4">
+                                            <input name="city_back_up" type="number"  min="0.01" max="60"value="<{$rate['city_back_up']}>" class="form-control"/>
+                                            <span class="help-block m-b-none">%</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group ">
+                                        <div class="col-sm-2 control-label">最少提现</div>
+                                        <div class="col-sm-4">
+                                            <input name="rate_min" type="number"  min="1" max="60"value="<{$rate['rate_min']}>" class="form-control"/>
+                                            <span class="help-block m-b-none"></span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group ">
+                                        <div class="col-sm-2 control-label">提现费率</div>
+                                        <div class="col-sm-4">
+                                            <input name="rate" type="number"  min="1" max="60"value="<{$rate['rate']}>" class="form-control"/>
+                                            <span class="help-block m-b-none">%</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group ">
+                                        <div class="col-sm-2 control-label">最低手续费</div>
+                                        <div class="col-sm-4">
+                                            <input name="rate_min_lose" type="text"  min="1" max="60"value="<{$rate['rate_min_lose']}>" class="form-control"/>
+                                            <span class="help-block m-b-none">元</span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group ">
+                                        <div class="col-sm-2 control-label">最高手续费</div>
+                                        <div class="col-sm-4">
+                                            <input name="rate_max_lose" type="number"  min="1" max="60"value="<{$rate['rate_max_lose']}>" class="form-control"/>
+                                            <span class="help-block m-b-none"></span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group ">
+                                        <div class="col-sm-2 control-label">安卓下载链接</div>
+                                        <div class="col-sm-4">
+                                            <input name="android_url" type="number"  min="1" max="60"value="<{$rate['android_url']}>" class="form-control"/>
+                                            <span class="help-block m-b-none"></span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group ">
+                                        <div class="col-sm-2 control-label">苹果下载链接</div>
+                                        <div class="col-sm-4">
+                                            <input name="ios_url" type="number"  min="1" max="60"value="<{$rate['ios_url']}>" class="form-control"/>
+                                            <span class="help-block m-b-none"></span>
+                                        </div>
+                                    </div>
+                                 <div class="form-group ">
+                                        <div class="col-sm-2 control-label">客服电话</div>
+                                        <div class="col-sm-4">
+                                            <input name="site_phone" type="text"  min="1" max="60"value="<{$rate['site_phone']}>" class="form-control"/>
+                                            <span class="help-block m-b-none"></span>
+                                        </div>
+                                    </div>
+                        <div class="form-group ">
+                            <div class="col-sm-2 control-label">钱包页面  顶部背景图 （1242x 468）</div>
+                            <div class="col-sm-4">
+                                <div class="input-group">
+                                    <input id="formitem_7" type="text" class="form-control" value="<{$rate.pic_wallet}>" name="pic_wallet" readonly="">
+                                    <span class="input-group-btn"> <button type="button" class="btn btn-primary pic_button" data-toggle="modal" data-target="#myModal4" data_key="formitem_7" data_val="preimg" >上传
+                                            <span class="input-group-btn"></span></button>
+                                    </span>
+                                    <span class="input-group-btn"><button type="button" id="clearimg_formitem_7" class="btn btn-info"><i class="fa fa-eye"></i>清空</button></span>
+                                     <span class="input-group-btn"><img  src="/static/images/11.png"  height="50" title="示例,单机预览" class="back_img"></span>
+                                    <script>
+                                        $("#clearimg_formitem_7").click(function () {
+                                            var url = $('#formitem_7').val('');
+
+                                        });
+                                    </script>
+                                </div>
+                                <div class="input-group" style="margin-top:.5em;">
+                                    <img src="/uploads/<{$rate.pic_wallet}>" class="img-responsive img-thumbnail" width="150" onerror="this.src='/static/image/nopic.jpg'" id="preimg">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group ">
+                            <div class="col-sm-2 control-label">收款页面背景图（1242x 468）</div>
+                            <div class="col-sm-4">
+                                <div class="input-group">
+                                    <input id="formitem_8" type="text" class="form-control" value="<{$rate.pic_cash}>" name="pic_cash" readonly="">
+                                    <span class="input-group-btn"> <button type="button" class="btn btn-primary pic_button" data-toggle="modal" data-target="#myModal4"  data_key="formitem_8" data_val="preimg2">上传
+                                            <span class="input-group-btn"></span></button>
+                                    </span>
+                                    <span class="input-group-btn"><button type="button" id="clearimg_formitem_8" class="btn btn-info"><i class="fa fa-eye"></i>清空</button></span>
+                                      <span class="input-group-btn"><img  src="/static/images/22.png"  height="50" title="示例,单击预览" class="back_img"></span>
+                                    <script>
+                                        $("#clearimg_formitem_8").click(function () {
+                                            var url = $('#formitem_8').val('');
+
+                                        });
+                                    </script>
+                                </div>
+                                <div class="input-group" style="margin-top:.5em;">
+                                    <img src="/uploads/<{$rate.pic_cash}>" class="img-responsive img-thumbnail" width="150" onerror="this.src='/static/image/nopic.jpg'" id="preimg2">
+                                </div>
+                            </div>
+                        </div>  
+                        <div class="form-group ">
+                            <div class="col-sm-2 control-label">分享 顶部 图1(1176 x348)</div>
+                            <div class="col-sm-4">
+                                <div class="input-group">
+                                    <input id="pic_share" type="text" class="form-control" value="<{$rate.pic_share}>" name="pic_share" readonly="">
+                                    <span class="input-group-btn"> <button type="button" class="btn btn-primary pic_button" data-toggle="modal" data-target="#myModal4"  data_key="pic_share" data_val="preimg3">上传
+                                            <span class="input-group-btn"></span></button>
+                                    </span>
+                                    <span class="input-group-btn"><button type="button" id="clearimg_pic_share" class="btn btn-info"><i class="fa fa-eye"></i>清空</button></span>
+                                       <span class="input-group-btn"><img  src="/static/images/33.png"  height="50" title="示例,单机预览" class="back_img"></span>
+                                    <script>
+                                        $("#clearimg_pic_share").click(function () {
+                                            var url = $('#pic_share').val('');
+
+                                        });
+                                    </script>
+                                </div>
+                                <div class="input-group" style="margin-top:.5em;">
+                                    <img src="/uploads/<{$rate.pic_share}>" class="img-responsive img-thumbnail" width="150" onerror="this.src='/static/image/nopic.jpg'" id="preimg3">
+                                </div>
+                            </div>
+                        </div> 
+                        <div class="form-group ">
+                            <div class="col-sm-2 control-label">分享 顶部 图2(1176 x348)</div>
+                            <div class="col-sm-4">
+                                <div class="input-group">
+                                    <input id="pic_share_2" type="text" class="form-control" value="<{$rate.pic_share_2}>" name="pic_share_2" readonly="">
+                                    <span class="input-group-btn"> <button type="button" class="btn btn-primary pic_button" data-toggle="modal" data-target="#myModal4"  data_key="pic_share_2" data_val="preimg4">上传
+                                            <span class="input-group-btn"></span></button>
+                                    </span>
+                                    <span class="input-group-btn"><button type="button" id="clearimg_pic_share_2" class="btn btn-info"><i class="fa fa-eye"></i>清空</button></span>
+                                       <span class="input-group-btn"><img  src="/static/images/33.png"  height="50" title="示例,单机预览" class="back_img"></span>
+                                    <script>
+                                        $("#clearimg_pic_share_2").click(function () {
+                                            var url = $('#pic_share_2').val('');
+
+                                        });
+                                    </script>
+                                </div>
+                                <div class="input-group" style="margin-top:.5em;">
+                                    <img src="/uploads/<{$rate.pic_share_2}>" class="img-responsive img-thumbnail" width="150" onerror="this.src='/static/image/nopic.jpg'" id="preimg4">
+                                </div>
+                            </div>
+                        </div>  
+                        <div class="form-group ">
+                            <div class="col-sm-2 control-label">收益 顶部背景图（1242x 468）</div>
+                            <div class="col-sm-4">
+                                <div class="input-group">
+                                    <input id="pic_income" type="text" class="form-control" value="<{$rate.pic_income}>" name="pic_income" readonly="">
+                                    <span class="input-group-btn"> <button type="button" class="btn btn-primary pic_button" data-toggle="modal" data-target="#myModal4"  data_key="pic_income" data_val="preimg5">上传
+                                            <span class="input-group-btn"></span></button>
+                                    </span>
+                                    <span class="input-group-btn"><button type="button" id="clearimg_pic_income" class="btn btn-info"><i class="fa fa-eye"></i>清空</button></span>
+                                       <span class="input-group-btn"><img  src="/static/images/44.png"  height="50" title="示例,单机预览" class="back_img"></span>
+                                    <script>
+                                        $("#clearimg_pic_income").click(function () {
+                                            var url = $('#pic_income').val('');
+
+                                        });
+                                    </script>
+                                </div>
+                                <div class="input-group" style="margin-top:.5em;">
+                                    <img src="/uploads/<{$rate.pic_income}>" class="img-responsive img-thumbnail" width="150" onerror="this.src='/static/image/nopic.jpg'" id="preimg5">
+                                </div>
+                            </div>
+                        </div>      
+                        <div class="form-group ">
+                            <div class="col-sm-2 control-label">个人中心 顶部 背景图；（1242x 468）</div>
+                            <div class="col-sm-4">
+                                <div class="input-group">
+                                    <input id="pic_member" type="text" class="form-control" value="<{$rate.pic_member}>" name="pic_member" readonly="">
+                                    <span class="input-group-btn"> <button type="button" class="btn btn-primary pic_button" data-toggle="modal" data-target="#myModal4"  data_key="pic_member" data_val="preimg6">上传
+                                            <span class="input-group-btn"></span></button>
+                                    </span>
+                                    <span class="input-group-btn"><button type="button" id="clearimg_pic_member" class="btn btn-info"><i class="fa fa-eye"></i>清空</button></span>
+                                       <span class="input-group-btn"><img  src="/static/images/55.png"  height="50" title="示例,单机预览" class="back_img"></span>
+                                    <script>
+                                        $("#clearimg_pic_member").click(function () {
+                                            var url = $('#pic_member').val('');
+
+                                        });
+                                    </script>
+                                </div>
+                                <div class="input-group" style="margin-top:.5em;">
+                                    <img src="/uploads/<{$rate.pic_member}>" class="img-responsive img-thumbnail" width="150" onerror="this.src='/static/image/nopic.jpg'" id="preimg6">
+                                </div>
+                            </div>
+                        </div>          
+                                    <div class="form-group">
+                                        <div class="col-sm-4 col-sm-offset-2">
+                                            <a href="javascript:;" id="submit" class="btn btn-warning btnbottom">立即保存</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<!-- jQuery Validation plugin javascript-->
+    <div class="modal" id="moda22l" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content"></div>
+        </div>
+    </div>
+<div class="modal fade" id="myModal4" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+            <div class="modal-header">
+
+                <h4 class="modal-title" id="myModalLabel">您可以尝试文件拖拽或者点击添加图片按钮，来添加图片.</h4>
+            </div>
+            <div id="uploader">
+                <div class="queueList">
+                    <div id="dndArea" class="placeholder">
+                        <div id="filePicker"></div>
+                        <p>或将照片拖到这里，单次最多可选300张</p>
+                    </div>
+                </div>
+                <div class="statusBar" style="display:none;">
+                    <div class="progress">
+                        <span class="text">0%</span>
+                        <span class="percentage"></span>
+                    </div><div class="info"></div>
+                    <div class="btns">
+                        <div id="filePicker2"></div><div class="uploadBtn">开始上传</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+            </div>
+        </div>
+    </div><!-- /.modal -->
+</div>
+<script src="/static/js/plugins/validate/jquery.validate.min.js"></script>
+<script src="/static/js/plugins/validate/messages_zh.min.js"></script>
+<script src="/static/js/plugins/webuploader/webuploader.js"></script>
+<script src="/static/js/form-validate.js"></script>
+    <script>
+    function hider($type) {
+        var $class_text = $(".class_text");
+        var $class_photo = $(".class_photo");
+
+        if ($type == '1') {
+            $class_text.show(300);
+            $class_photo.hide(300);
+        } else if ($type == '2') {
+            $class_text.hide(300);
+            $class_photo.hide(300);
+        } else {
+            $class_text.hide(300);
+            $class_photo.show(300);
+        }
+    }
+    $(function() {
+        $("#submit").click(function() {
+            var $form = $("#form1");
+            $.ajax({
+                url: "<{php}>echo url('Setting/edit')<{/php}>",
+                data: $form.serialize(),
+                type: 'post',
+                dataType: 'json',
+                success: function(d) {
+                    if (d.stat == '1') {
+                        swal({
+                            title: "太帅了",
+                            text: d.msg ? d.msg : '操作成功！',
+                            type: "success"
+                        }, function() {
+                            location.href = "<{:url('Setting/index')}>";
+                        });
+                    } else {
+                        swal({
+                            title: "出错了",
+                            text: d.msg ? d.msg : '操作失败',
+                            type: "error"
+                        });
+                    }
+                },
+                error: function(d) {
+                    swal({
+                        title: "出错了",
+                        text: d.msg ? d.msg : '操作失败',
+                        type: "error"
+                    });
+                }
+            });
+        });
+    });
+ var i=1;        
+ var cid="";
+ var pid="";
+ $(".pic_button").click(function(){
+        cid=$(this).attr("data_key"); 
+        pid=$(this).attr("data_val"); 
+        console.log(cid);
+     
+ })
+$('#myModal4').on('shown.bs.modal', function (e) {
+      if(i){
+ $.getScript("/static/js/webuploader-demo_1.js");  
+    }
+ 
+  i=0;
+})    
+$(".back_img").click(function(){
+    window.open($(this).attr("src"));
+})
+    </script>
+    <{include file="public/footer" }>

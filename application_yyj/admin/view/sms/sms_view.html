@@ -1,0 +1,108 @@
+<{include file="public/header"}>
+<link type="text/css" rel="stylesheet" href="/static/css/plugins/iCheck/custom.css">
+<script type="text/javascript" charset="utf-8" src="/static/js/plugins/iCheck/icheck.min.js"></script>
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="tabs-container ibox-title">
+					<ul class="nav nav-tabs">
+						<{if condition="$action eq 'index'"}>
+						<li class="active"><a href="javascript:;">短信模板列表</a></li>
+						<li ><a class="icon iconfont icon-favor_light" href="<{:url('sms/add')}>" class="jf_sub_menu">新增/修改短信模板</a></li>
+						<{else}>
+						<li><a class="icon iconfont icon-favor_light" href="<{:url('sms/index')}>" class="jf_sub_menu">短信模板列表</a></li>
+						<li class="active"><a href="javascript:;">新增/修改短信模板</a></li>
+						<{/if}>
+					</ul>
+                    <div class="ibox-content">
+                    	<div class="">
+	                    <form class="form-horizontal" id="form1" onclick="return false">
+    						<div class="">
+								<input type="hidden" name="id" value="<{$info.id}>">
+								<div class="form-group ">
+                                    <div class="col-sm-2 control-label">模板名称:</div>
+                                    <div class="col-sm-4">
+                                        <input id="" type="text" class="form-control" value="<{$info.name}>" name="name">
+                                        <span class="help-block m-b-none"></span>
+                                    </div>
+                                </div>  
+								
+								<div class="form-group ">
+                                    <div class="col-sm-2 control-label">CODE:</div>
+                                    <div class="col-sm-4">
+                                        <input id="" type="text" class="form-control" value="<{$info.code}>" name="code">
+                                        <span class="help-block m-b-none"></span>
+                                    </div>
+                                </div> 
+								 <div class="form-group ">
+                                    <div class="col-sm-2 control-label">外部接口ID:</div>
+                                    <div class="col-sm-4">
+                                        <input id="" type="number" class="form-control" min="0" value="<{$info.out_tplid}>" name="out_tplid">
+                                        <span class="help-block m-b-none"></span>
+                                    </div>
+                                </div> 
+								<div class="form-group ">
+                                    <div class="col-sm-2 control-label">内容:</div>
+                                    <div class="col-sm-4">
+                                        <textarea value="" name="content" class="form-control"><{$info.content}></textarea>
+										<span class="help-block m-b-none"></span>
+                                    </div>
+                                </div>
+								<div class="form-group ">
+									<div class="col-sm-2 control-label">状态:</div>
+									<div class="col-sm-4">
+										<div class="checkbox i_checks"><label class=""><div class="iradio_square-green" style="position: relative;"><input type="radio" value="0" name="stat" style="position: absolute; opacity: 0;" <{if condition="$info.stat eq 0"}>checked<{/if}>></div>禁用 &nbsp;&nbsp;&nbsp;&nbsp;<div class="iradio_square-green" style="position: relative;"><input type="radio" value="1" name="stat" style="position: absolute; opacity: 0;" <{if condition="$info.stat eq 1"}>checked<{/if}>></div>启用 &nbsp;&nbsp;&nbsp;&nbsp;</label></div><script>;$('.i_checks').iCheck({ checkboxClass: 'icheckbox_square-green', radioClass: 'iradio_square-green', });</script>
+										<span class="help-block m-b-none"></span>
+									</div>
+								</div>
+					            <div class="form-group">
+		                            <div class="col-sm-4 col-sm-offset-2">
+		                                <a href="javascript:;" id="submit" class="btn btn-warning btnbottom">立即保存</a>
+		                            </div>
+		                        </div>
+    						</div>
+        				</form>
+        				</div>
+	                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+	$(function(){
+		$("#submit").click(function (){
+			var $form = $("#form1");
+			$.ajax({
+				url:"<{php}>echo url('sms/'.$action)<{/php}>",
+				data:$form.serialize(),
+				type:'post',
+				dataType:'json',
+				success:function(d){
+					if(d.stat == '1'){
+						swal({
+							title: "太帅了",
+							text: d.msg?d.msg:'操作成功！',
+							type: "success"
+						},function(){
+							location.href="<{:url('sms/index')}>";
+						});
+					}else{
+						swal({
+							title: "出错了",
+							text: d.msg?d.msg:'操作失败',
+							type: "error"
+						});
+					}
+				},
+				error:function(d){
+					swal({
+						title: "出错了",
+						text: d.msg?d.msg:'操作失败',
+						type: "error"
+					});
+				}
+			});
+		});
+	});
+    </script>
+<{include file="public/footer"}>

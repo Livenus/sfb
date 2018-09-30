@@ -1,0 +1,325 @@
+<{include file="public/header"}>
+<script type="text/javascript" charset="utf-8" src="/static/js/plugins/bootstrap-table/bootstrap-table.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="/static/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js"></script>
+<link rel="stylesheet" href="/static/css/plugins/bootstraptable/bootstrap-table.min.css">
+    <style type="text/css">
+        body{
+            background: #f3f3f4;
+        }
+    </style>
+
+<div class=" wrapper wrapper-content">
+<div class="ibox-title">文章列表:</div>
+
+
+ 
+<!-- 
+<div class="btn-group"><a href="javascript:;" type="button" class="btn btn-sm btn-white jf_refresh"><i class="fa fa-cog"></i> 设置</a></div>
+<div class="btn-group"><a href="javascript:;" type="button" class="btn btn-sm btn-white"><i class="fa fa-paper-plane-o"></i> 生成</a></div>
+-->
+  
+
+  
+<!--信息列表start-->
+
+<div class="ibox-content">
+                            <div class="hidden-xs" id="exampleTableEventsToolbar" role="group">
+  <div class="btn-group"><a href="<{:url('article/add')}>"  type="button" class="btn btn-sm btn-info"><i class="fa fa-file-o"></i> 添加文章</a></div>
+  <div class="btn-group"><a href="javascript:delall();" type="button" class="btn btn-sm btn-white" id="dell"><i class="fa fa-trash-o"></i> 删除</a></div>
+                            </div>
+                            <div class="right">
+
+
+
+  <form id="search">
+  <span style=" line-height: 30px; margin-right: 5px;">所属类型:</span>
+    <select id="se_type" class="input_zdy input-sm" name="type">
+        <option value='-1'>全部</option>
+       <option value="1">协议</option>
+        <option value="2">帮助</option>
+        <option value="3">未知</option>
+        <option value="4">新手指引</option>
+    </select>
+    <input type="text" id="search_name" class="input_zdy input-sm" name="title" placeholder="文章名称" value="">
+ <a href="javascript:;" id="btnsearch" class="btn btn-primary btn-sm">查询</a>
+  </form>
+</div>
+
+
+
+
+
+                            <table id="dg" data-height="100%" data-mobile-responsive="true">
+                            </table>
+</div>
+
+<!--信息列表end-->
+                <!--分页start-->
+                <div class="btn-group">
+                   
+               </div>
+                           <!-- 分页end-->
+</div>
+<script>
+    //弹框
+    function alert_m(msg) {
+        swal("提示信息", msg, "success");
+    }
+    //post数据
+    function update_post(url, data, msg) {
+        $.post(url, data, function (data) {
+
+            if (data.stat == 1) {
+                msg();
+            } else {
+                alert(data.msg);
+            }
+        })
+    }
+    //确认框
+    function confirm_dialog(title, dec, action) {
+        swal({
+            title: title,
+            text: dec,
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            cancelButtonText: "取消",
+            confirmButtonText: "确认",
+            closeOnConfirm: false
+        }, function (isConfirm) {
+            if (isConfirm) {
+                action();
+            }
+        });
+
+    }
+
+
+
+</script>
+<script>
+    var channel_edit="<{:url('article/edit')}>";
+    var list="<{:url('article/listajax')}>";
+    var list="<{:url('article/listajax')}>";
+     var update_url_s="<{:url('article/update_status')}>";
+     function delall(){
+        var items = $("#dg").bootstrapTable('getSelections');
+        items = objcolum(items, 'id');
+        if (items.length <= 0) {
+            swalErrorMsg('请选择要删除的值');
+        }
+        del(items);
+         
+         
+     }
+    function del(ids) {
+        swal({
+            title: "您确定要删除吗",
+            text: "删除后将无法恢复，请谨慎操作！",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "确定",
+            cancelButtonText: "取消",
+            closeOnConfirm: false,
+            closeOnCancel: false
+        },
+                function (isConfirm) {
+                    var cur = 0;
+
+                    if (isConfirm) {
+                        if (!$.isArray(ids)) {
+                            ids = [ids];
+                        }
+                        var url = "<{:url('article/del')}>";
+                        $.ajax({
+                            url: url,
+                            data: {id: ids},
+                            type: 'post',
+                            dataType: 'json',
+                            success: function (d) {
+
+
+                                init(cur, ids.length, d);
+
+
+                            }
+                        });
+                        //swal("删除成功！", "您已经永久删除了这条信息。", "success");
+                    } else {
+                        swal("已取消", "您取消了删除操作！", "error");
+                    }
+                });
+    }
+    function init(cur, i, d) {
+
+
+        var percent = parseInt(cur * 100 / i);
+        var content = '<div class="pull-left"><p id="p_text"><span id="p_text1">' + cur + '</span>/' + i + '</p></div>' +
+                '<div class="progress">' +
+                '   <div class="progress-bar" role="progressbar progress-bar-striped active" aria-valuenow="' + percent + '" aria-valuemin="0" aria-valuemax="100" style="width: ' + percent + '%;min-width: 2em;">' + percent + '%</div>' +
+                '</div>';
+
+        layer.open({type: 1, title: '系统提示', content: content, area: ['600px', '460px'],
+            success: function () {
+                var schedule = setInterval(function () {
+                    cur++;
+                    $("#p_text1").html(cur);
+                    percent = parseInt(cur * 100 / i);
+                    $('.progress').html('<div class="progress-bar" role="progressbar progress-bar-striped active" aria-valuenow="' + percent + '" aria-valuemin="0" aria-valuemax="100" style="width: ' + percent + '%;min-width: 2em;">' + percent + '%</div>')
+                    if (cur >= i) {
+                        clearInterval(schedule);
+                        setTimeout(function () {
+                            if (d.stat == '1') {
+                                swal({
+                                    title: "太帅了",
+                                    text: d.msg,
+                                    type: "success"
+                                }, function () {
+                                    var url = "<{:url('article/index')}>";
+                                    $('#dg').bootstrapTable("refresh");
+                                });
+                            } else {
+                                swal({
+                                    title: "出错了",
+                                    text: d.msg,
+                                    type: "error"
+                                });
+                            }
+                        }, 500)
+
+                    }
+                }, 500)
+            }});
+
+    }
+    function getQueryParams() {
+        var q = {};
+var params = $("#search").serializeArray();
+for (var item in params) {
+   q[params[item].name] = params[item].value;
+}
+        return q;
+    }
+    $("#btnsearch").click(function () {
+        q = getQueryParams();
+        var url="<{:url('article/listajax')}>";
+        $("#dg").bootstrapTable('refresh', {url: url, query: q});
+    })
+         $('#dg').bootstrapTable({
+            url: list,
+            //method:'post',
+            queryParams: function (params) {
+                params.p = parseInt(params.offset / params.limit) + 1;
+                params = $.extend(params, getQueryParams());
+                return params;
+            },
+            queryParamsType: "limit",
+            contentType: 'application/json',
+            dataType: 'json',
+            sidePagination: "server", //表示服务端请求
+            pagination: true, //启动分页
+            pageNumber: 1, //当前第几页
+            pageSize: 10, //每页显示的记录数
+            pageList: [10, 15, 20], //记录数可选列表
+            dataField: 'rows',
+            idField: "id",
+            columns: [{checkbox: true, align: 'center', valign: 'middle'},
+                {title: 'ID', field: 'id', align: 'center', valign: 'middle'},
+                {title: '标题', field: 'title', align: 'center', valign: 'middle'},
+                {title: '类型', field: 'type', align: 'center', valign: 'middle',formatter: function (value, row, index) {
+                         var html="";
+                         if (row.type == '1') {
+                             
+                             html="协议";
+                         }else if(row.type == '2'){
+                              html="帮助";
+                         }else if(row.type == '4'){
+                              html="新手指引";
+                         }
+                        return html;
+                        
+                }},
+                {title: '简介', field: 'des', align: 'center', valign: 'middle',formatter: function (value, row, index) {
+                        
+                        return row.des.slice(0,15);
+                }},
+                {title: '添加时间', field: 'addtime', align: 'center', valign: 'middle'},
+                {title: '状态', field: 'stat', align: 'center', valign: 'middle',formatter: function (value, row, index) {
+                        var html="";
+                        if (row.stat == '1') {
+                            html = '<i class="fa fa-toggle-on infoOn upstatus" data-status='+0+' data-id='+row.id +'></i>';
+                        } else {
+                            html = '<i class="fa fa-toggle-on infoOff upstatus" data-status='+1+' data-id='+row.id +'></i>';
+                        }
+                        return html;
+                        
+                        
+                }},
+                {title: '操作', field: 'n_do', align: 'center', valign: 'middle',
+                    formatter: function (value, row, index) {
+                        var html = '';
+                        html = '<a href="' + channel_edit + '?id=' + row.id + '" class="btn btn-warning btn-sm" data-toggle="tooltip" data-placement="top" title="编辑" style=" margin-right:4px;"><span class="glyphicon glyphicon-edit"></span> 编辑</a><a href="javascript:;" onclick="del(' + row.id + ')" class="btn btn-warning btn-sm" data-toggle="tooltip" data-placement="top" title="删除" style=" margin-right:4px;"><span class="glyphicon glyphicon-remove"></span> 删除</a>';
+                        return html;
+                    }
+                }],
+            responseHandler: function (res) {
+                //远程数据加载之前,处理程序响应数据格式,对象包含的参数: 我们可以对返回的数据格式进行处理
+                //在ajax后我们可以在这里进行一些事件的处理
+                return res;
+            },
+            search: false,
+            iconSize: 'outline',
+            toolbar: '#exampleTableEventsToolbar',
+            icons: {
+                refresh: 'glyphicon-repeat',
+                toggle: 'glyphicon-list-alt',
+                columns: 'glyphicon-list'
+            },
+            toolbarAlign: 'left',
+            showToggle: false,
+            showColumns: false, //显示下拉框勾选要显示的列
+            // minimumCountColumns:3,
+            showRefresh:true,//显示刷新按钮
+            striped: true, //表格显示条纹
+            singleSelect: false, //复选框只能选择一条记录  
+            clickToSelect: false, //点击行即可选中单选/复选框  
+            checkboxHeader: true
+        });
+
+$(function(){
+   $("body").on("click",".upstatus",function(e){
+        e.preventDefault();
+        var status=$(this).attr("data-status");
+
+         var id=$(this).attr("data-id");
+       var data={id:id,status:status};
+       var url=update_url_s;
+         if(status==1){
+             var msg="确认审核此文章";
+         }else{
+             var msg="确认屏蔽此文章";   
+         };
+confirm_dialog("确认提示",msg,function(){
+
+        if(id){
+            
+            update_post(url,data,function(){
+                        swal("操作成功！", msg, "success");   
+                        $("#dg").bootstrapTable("refresh");
+            });
+        }
+
+    
+});
+    })  
+    
+    
+    
+})
+
+
+</script>
+
+    <{include file="public/footer" }>

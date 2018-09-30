@@ -1,0 +1,134 @@
+<{include file="public/header" /}>
+
+
+	<table id="dg"  fit="true"></table>
+
+	<div id="win"></div>
+
+<script>
+require(['common','json'],function(){
+	$('#dg').datagrid({  
+	    url: "<{:url('role/groupajax')}>",  
+	    animate:true,  
+	    lines:true,  
+
+	    idField:'id',
+	    selectOnCheck:false,
+	    checkOnSelect:false,
+
+		frozenColumns:[[
+		                {field:'ck',checkbox:true}
+					]],
+	    
+	    columns:[[
+	              
+	              {title:'操作',field:'notuse',align:'right',
+	            	  formatter:function(value,rowData,rowIndex){
+	            		  var $edit = $('<a href="javascript:;">[修改]</a>')
+	              		var html = ''
+	               		html += '<a href="javascript:;" onclick="openwin('+JSON.stringify(rowData).replace(/(\")/g, "'")+')">[修改]</a>';
+	               		html += '<a href="javascript:;" onclick="auth('+rowData.id+')">[分配权限]</a>';
+	               		html += '<a href="javascript:;" onclick="del('+rowData.id+')">[删除]</a>';
+	               		
+	               		return '<div class="toolbar">'+html+'</div>';
+	              	}
+	              },
+	              
+	              {title:'权限组名称',field:'title',width:180},
+	          ]],
+	   	pagination:true,
+		pageSize: 20,
+		pageList: [10,20],
+	  	rownumbers:true,
+		toolbar: [{
+			id:'btnback',
+			text:'刷新',
+			iconCls:'icon-reload',
+			handler:function(){
+				$('#dg').datagrid('reload');
+			}
+		},{
+			id:'btnadd',
+			text:'添加',
+			iconCls:'icon-add',
+			handler:function(){
+				openwin();
+			}
+		}],
+
+	});
+
+});
+
+function openwin(item){
+
+	
+	var defaultitem = {title:'',id:''};
+	item = $.extend(defaultitem,item);
+	
+	var url = (!item.id)?"<{:url('role/groupadd')}>":"<{:url('role/groupedit')}>";
+	
+	$('#win').dialog({
+	    modal:true,
+	    title:'添加管理员组',
+	    content:'<div><lable>组名称：</label><input value="'+item.title+'" id="title"/><input type="hidden" id="id" value="'+item.id+'"/></div>',
+	    width:500,
+	    height:200,
+		buttons:[{
+			text:'保存',
+			iconCls:'icon-ok',
+			handler:function(){
+				$.ajax({
+					url:url,
+					method:'post',
+					dataType:'json',
+					data:{title:$("#title").val(),id:$("#id").val()},
+					success:function(d){
+						if(d.stat == '1'){
+							$('#win').dialog('close');
+							$('#dg').datagrid('reload');
+						}else{
+							$.messager.alert('出错了',d.msg?d.msg:'出错了','error');
+						}
+					},
+					error:function(){
+						$.messager.alert('出错了','服务器出错了，请稍后再试','error');
+					}
+				});
+			}
+		},{
+			text:'取消',
+			handler:function(){
+				$('#win').dialog('close');
+			}
+		}]
+	});
+}
+function auth(id){
+	
+	location.href="/Back/rule/rule_group/id/"+id+".html";
+	
+}
+function del(id){
+	var msg='您确定要删除吗？';
+	if(confirm(msg)==true){
+		$.ajax({
+			url:"<{:url('role/groupdel')}>",
+			type:'post',
+			dataType:'json',
+			data:{id:id},
+			success:function(d){
+				if(d.stat == '1'){
+					$('#dg').datagrid('reload');
+				}else{
+					$.messager.alert('提示', d.msg?d.msg:'操作失败', 'error');
+				}
+			}
+		});
+	}
+
+}
+
+</script>
+
+<{include file="public/footer" /}>
