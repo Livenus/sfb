@@ -24,13 +24,16 @@ class Order extends \app\api\controller\Home {
         $this->MemberGroup = model("MemberGroup");
         $this->Member_login_token = model("Member_login_token");
         $this->MemberMonylog=model("member_monylog");
+        $this->Product = model("Product");
+        $this->Red = model("Red");
+        $this->ProductOrder = model("ProductOrder");
         $this->notify_url = url("api/order/notify", "", "", true);
         $this->notify_tongming = url("api/order/notify_tongming", "", "", true);
         $this->return_url = url("api/order/return_url", "", "", true);
         $this->notify_zhongshang = url("api/order/notify_zhongshang", "", "", true);
         $this->notify_tongfu = url("api/order/notify_tongfu", "", "", true);
     }
-
+	
     //生成订单
     public function add_orderAc($money = 0, $bank_card_id = "", $pay_type_id = "") {
          $this->get_user_id();
@@ -1926,43 +1929,73 @@ class Order extends \app\api\controller\Home {
         $log->save($loginfo);
         $input = file_get_contents("php://input");
         $data = \weixin\Weixinpay::xmlToArray($input);
-        mlog($data);
+		
+		mlog($data);
+        
         if ($data["result_code"] == "SUCCESS") {
-            $order = $this->Order->get_by_sn($data["out_trade_no"]);
-            if ($order["stat"] == 0 && $order["amount"]*100 == $data["total_fee"] && (int) $data["total_fee"] > 0) {
-                $status = $this->Order->editByid(array("stat" => 1,"finish_time"=>time()), $order["id"]);
-                 $this->MemberGroupLog->editbyorder_id(array("status" => 1),$order["id"]);
+            if($data['attach'] == 'gq'){
+                //股权
+
+                $log = model("log");
+                $inputg=input("get.");
+                $post=input("post.");
+                $res = print_r($inputg, true) . print_r($post, true) . print_r($_REQUEST, true);
+                $loginfo["log_info"] = $res;
+                $loginfo["log_time"] = time();
+                $loginfo["ip"]=0;
+                $log->save($loginfo);
+
+                $out_trade_no = $data["out_trade_no"];
+                $this->set_product_order($out_trade_no,$data['transaction_id']);
+                    echo "<xml> 
+          <return_code><![CDATA[SUCCESS]]></return_code>
+           <return_msg><![CDATA[OK]]></return_msg>
+         </xml>
+        ";
+            die('end');    
+            }else{
+                $order = $this->Order->get_by_sn($data["out_trade_no"]);
+                if ($order["stat"] == 0 && $order["amount"]*100 == $data["total_fee"] && (int) $data["total_fee"] > 0) {
+                    $status = $this->Order->editByid(array("stat" => 1,"finish_time"=>time()), $order["id"]);
+                     $this->MemberGroupLog->editbyorder_id(array("status" => 1),$order["id"]);
+                }
+
+                if ($status["stat"]==1) {
+                   //交易记录
+                    $moeny_log = model("MemberMonylog");
+                    $mlog["member_id"]=$order["member_id"];
+                    $mlog["val"]=$order["amount"];
+                    $mlog["type"]=5;
+                    $mlog["op_id"]=0;
+                    $mlog["type_ordersn"]=$order["sn"];
+                    $moeny_log->addItem($mlog);
+                    //充值消息
+                    $msg["type"]=5;
+                    $msg["to"]=$order["member_id"];
+                    $msg["content"]=$order;
+                    $this->Msg->addItem($msg);
+                    //升级返利
+                $moeny_log = model("MemberMonylog");
+                $moeny_log->set_pid_money_up($order["sn"]);
+                    echo "<xml> 
+          <return_code><![CDATA[SUCCESS]]></return_code>
+           <return_msg><![CDATA[OK]]></return_msg>
+         </xml>
+        ";
+                } else {
+                    echo "<xml> 
+          <return_code><![CDATA[FAIL]]></return_code>
+           <return_msg><![CDATA[OK]]></return_msg>
+         </xml>
+        ";
+                }
+
+
             }
+
+
         }
-        if ($status["stat"]==1) {
-           //交易记录
-            $moeny_log = model("MemberMonylog");
-            $mlog["member_id"]=$order["member_id"];
-            $mlog["val"]=$order["amount"];
-            $mlog["type"]=5;
-            $mlog["op_id"]=0;
-            $mlog["type_ordersn"]=$order["sn"];
-            $moeny_log->addItem($mlog);
-            //充值消息
-            $msg["type"]=5;
-            $msg["to"]=$order["member_id"];
-            $msg["content"]=$order;
-            $this->Msg->addItem($msg);
-            //升级返利
-        $moeny_log = model("MemberMonylog");
-        $moeny_log->set_pid_money_up($order["sn"]);
-            echo "<xml> 
-  <return_code><![CDATA[SUCCESS]]></return_code>
-   <return_msg><![CDATA[OK]]></return_msg>
- </xml>
-";
-        } else {
-            echo "<xml> 
-  <return_code><![CDATA[FAIL]]></return_code>
-   <return_msg><![CDATA[OK]]></return_msg>
- </xml>
-";
-        }
+
     }
 
     //测试返利
@@ -1983,12 +2016,15 @@ class Order extends \app\api\controller\Home {
     }
     //缴费订单
     public function pay_fee_orderAc($group_id = "") {
-require_once EXTEND_PATH."weixin_sdk/lib/WxPay.Api.php";
-require_once EXTEND_PATH."weixin_sdk/example/WxPay.JsApiPay.php";
-require_once EXTEND_PATH."weixin_sdk/example/WxPay.Config.php";
-        $this->get_user_id();
-	$tools = new \JsApiPay();
-	$openid = $tools->GetOpenid();
+        //购买股权=1, 会员升级=0;
+        $is_gq = input('is_gq', 0);
+
+		require_once EXTEND_PATH."weixin_sdk/lib/WxPay.Api.php";
+		require_once EXTEND_PATH."weixin_sdk/example/WxPay.JsApiPay.php";
+		require_once EXTEND_PATH."weixin_sdk/example/WxPay.Config.php";
+		$this->get_user_id();
+		$tools = new \JsApiPay();
+		$openid = $tools->GetOpenid();
         if(empty($openid)){
             return $this->err(9000, "获取openid失败");
         }
@@ -1996,51 +2032,129 @@ require_once EXTEND_PATH."weixin_sdk/example/WxPay.Config.php";
         if(empty($input)){
             $input= input("param.");
         }
-        $input["member_id"]=$this->member_id;
-        $check = $this->validate($input, "Order.pay_fee_order");
-        if ($check !== true) {
-            return $this->err(9000, $check);
+
+        if($is_gq == '1'){
+           
+           
+            $product_id=input("id");
+            $num=input("num");
+            if(empty($product_id)||!is_numeric($product_id)){
+                return $this->err(9000,"id不能为空");
+            }
+            if(empty($num)||!is_numeric($num)&&!is_int($num)&&$num>0){
+                return $this->err(9000,"数量不能为空,必须为整数");
+            }
+            $product=$this->Product->get_by_id($product_id);
+            if(empty($product)||$product["stat"]!=1){
+                return $this->err(9000,"产品不存在");
+            }
+            $sum=$this->ProductOrder->sum(["member_id"=>$this->member_id,"stat"=>1]);
+            if($sum+$num>$product["per_num"]){
+                return $this->err(9000,"超出购买份数");
+            }
+            $data["product_id"]=$product_id;
+            $data["num"]=$num;
+            $data["member_id"]=$this->member_id;
+            $data["amount"]=$num*$product["price"];
+            $data["red"]=$num*$product["red"];
+            $data["sn"]="gq".date("YmdHis"). mt_rand(1000, 9999);
+            $data["stat"]=0;
+            $data["add_time"]=time();
+           /*  $info = $this->Red->where('member_id',$data['member_id'])->find();
+            $info["num"]=$num;
+            $info["amount"]=$data["amount"];
+            $info["red"]=$data["red"]; */
+            Db::startTrans();
+            try{ 
+                $status=$this->ProductOrder->addItem_id($data);
+
+                Db::commit();
+
+                $new_data["ip"] = real_ip();
+                $str = mt_rand(100, 99999);
+                $new_data["nonce_str"] = md5($str);
+                $new_data["openid"]=$openid;
+                $new_data['sn']   = $data["sn"];
+                $new_data['attach'] = 'gq';
+                $new_data['amount'] =$product['price']*$num ;
+                $weixin = new \weixin\Weixinpay($new_data);
+                $result = $weixin->get_order();
+                if($result["return_code"]!='SUCCESS'){
+                    return $this->err(9000,$result["return_msg"]);
+                }
+                
+                    $reponse["order"] = $new_data;
+                    $this->Order->editById(array("outer_sn"=>$result["prepay_id"]),$new_data["id"]);
+                    $reponse["weixin_order"] = $result;
+                    $jsApiParameters = $tools->GetJsApiParameters($result);
+                    $this->assign("jsApiParameters",$jsApiParameters);
+                    return $this->fetch();
+                
+
+
+
+            }catch(\Exception $e){
+                Db::rollback();
+                return $this->err(9000,$status["errmsg"]);
+            }
+      
+
+
+
+
+
+        }else{
+
+            $input["member_id"]=$this->member_id;
+            $check = $this->validate($input, "Order.pay_fee_order");
+            if ($check !== true) {
+                return $this->err(9000, $check);
+            }
+
+            $mem = $this->Member->get_by_id($this->member_id);
+            $group_data = $this->MemberGroup->get_by_id($group_id);
+            $mem_group = $this->MemberGroup->get_by_id($mem["membergroup_id"]);
+            $money = $group_data["money"] - $mem_group["money"];
+            if ($money) {
+                $data["member_id"] = $this->member_id;
+                $data["amount"] = $money;
+                $data["type"] = 2;
+                $data["channel_id"] = 0;
+                $data["reason"] = "";
+                $order_data = $this->Order->addItem_id($data);
+                $data_group["member_id"] = $this->member_id;
+                $data_group["order_id"] = $order_data["data"];
+                $data_group["low_group"] = $mem["membergroup_id"];
+                $data_group["heigh_group"] = $group_data["id"];
+                $data_group["low_money"] = $mem_group["money"];
+                $data_group["heigh_money"] = $group_data["money"];
+                $this->MemberGroupLog->addItem_id($data_group);
+            }
+            $new_data = $this->Order->get_by_id($this->member_id, $order_data["data"]);
+            $new_data["ip"] = real_ip();
+            $str = mt_rand(100, 99999);
+            $new_data["nonce_str"] = md5($str);
+            $new_data["openid"]=$openid;
+            $weixin = new \weixin\Weixinpay($new_data);
+            $result = $weixin->get_order();
+            if($result["return_code"]!='SUCCESS'){
+                return $this->err(9000,$result["return_msg"]);
+            }
+            if ($order_data["stat"] == 1) {
+                $reponse["order"] = $new_data;
+                $this->Order->editById(array("outer_sn"=>$result["prepay_id"]),$new_data["id"]);
+                $reponse["weixin_order"] = $result;
+                $jsApiParameters = $tools->GetJsApiParameters($result);
+                $this->assign("jsApiParameters",$jsApiParameters);
+                return $this->fetch();
+            }
+
         }
 
-        $mem = $this->Member->get_by_id($this->member_id);
-        $group_data = $this->MemberGroup->get_by_id($group_id);
-        $mem_group = $this->MemberGroup->get_by_id($mem["membergroup_id"]);
-        $money = $group_data["money"] - $mem_group["money"];
-        if ($money) {
-            $data["member_id"] = $this->member_id;
-            $data["amount"] = $money;
-            $data["type"] = 2;
-            $data["channel_id"] = 0;
-            $data["reason"] = "";
-            $order_data = $this->Order->addItem_id($data);
-            $data_group["member_id"] = $this->member_id;
-            $data_group["order_id"] = $order_data["data"];
-            $data_group["low_group"] = $mem["membergroup_id"];
-            $data_group["heigh_group"] = $group_data["id"];
-            $data_group["low_money"] = $mem_group["money"];
-            $data_group["heigh_money"] = $group_data["money"];
-            $this->MemberGroupLog->addItem_id($data_group);
-        }
-        $new_data = $this->Order->get_by_id($this->member_id, $order_data["data"]);
-        $new_data["ip"] = real_ip();
-        $str = mt_rand(100, 99999);
-        $new_data["nonce_str"] = md5($str);
-        $new_data["openid"]=$openid;
-        $weixin = new \weixin\Weixinpay($new_data);
-        $result = $weixin->get_order();
-        if($result["return_code"]!='SUCCESS'){
-            return $this->err(9000,$result["return_msg"]);
-        }
-        if ($order_data["stat"] == 1) {
-            $reponse["order"] = $new_data;
-            $this->Order->editById(array("outer_sn"=>$result["prepay_id"]),$new_data["id"]);
-            $reponse["weixin_order"] = $result;
-            $jsApiParameters = $tools->GetJsApiParameters($result);
-            $this->assign("jsApiParameters",$jsApiParameters);
-            return $this->fetch();
-        }
+
 
         return $this->err(9000, "生成订单失败");
+
     }
     //缴费订单阿里
     public function pay_fee_order_aliAc($group_id = "") {
@@ -2288,17 +2402,23 @@ echo "success";
         public  function set_product_order($sn,$trade_no){
             $product_order_model=model("ProductOrder");
             $red_model=model("Red");
-		$order=$product_order_model->get_by_sn($sn);
+            $this->Product = model('Product');
+            $product=$this->Product->get_by_id($product_id);
+			$order=$product_order_model->get_by_sn($sn);
                 if(!empty($order)&&$order["stat"]===0){
                   $red["red"]=$order["red"];
+                  $red["num"] = $order['num'];
                   $red["member_id"]=$order["member_id"];
                   $red["add_time"]=time();
+                  $red['amount'] = $red['num']*$product['price'];
                   $old=$red_model->get_by_uid($order["member_id"]);
                   if(empty($old)){
                       
                      $status1=$red_model->addItem($red);  
                   }else{
                       $red["red"]=$red["red"]+$old["red"];
+                      $red['num'] = $red['num']+$old["num"] ;
+                      $red['amount'] =$red['amount']+$old['amount'];
                       $status1=$red_model->editById($red,$old["id"]);  
                       mlog($status1);
                   }
