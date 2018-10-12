@@ -1,0 +1,199 @@
+<{include file="public/header"}>
+<script type="text/javascript" charset="utf-8" src="/static/js/plugins/bootstrap-table/bootstrap-table.min.js"></script>
+<script type="text/javascript" charset="utf-8" src="/static/js/plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js"></script>
+<link rel="stylesheet" href="/static/css/plugins/bootstraptable/bootstrap-table.min.css">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="ibox float-e-margins">
+        <div class="ibox-title" style=" padding-bottom: 0;">
+            <ul class="nav nav-tabs">
+                <li class="active"><a href="javascript:;">计划任务管理</a></li>
+            </ul>
+        </div>
+        <div class="ibox-content">
+
+            <div class="row row-lg">
+                <div class="col-sm-12">
+                    <!-- Example Events -->
+                    <div class="example-wrap">
+                        <div class="example">
+                            <div class="hidden-xs" id="exampleTableEventsToolbar" role="group">
+                            </div>
+                            <!---search start-->
+                            <!---search end---->
+                            <table id="dg" data-height="100%" data-mobile-responsive="true">
+                            </table>
+                        </div>
+                    </div>
+                    <!-- End Example Events -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+
+    var channel_edit = "<{:url('StartTask/edit')}>";
+    //var update_url="<{:url('Product/update_status')}>";
+    function getQueryParams() {
+        var q = {};
+        q.ap_id = $("#ap_id").val();
+        q.a_name = $("#a_name").val();
+        return q;
+    }
+    
+    
+    function init(cur, i, d) {
+
+
+        var percent = parseInt(cur * 100 / i);
+        var content = '<div class="pull-left"><p id="p_text"><span id="p_text1">' + cur + '</span>/' + i + '</p></div>' +
+                '<div class="progress">' +
+                '   <div class="progress-bar" role="progressbar progress-bar-striped active" aria-valuenow="' + percent + '" aria-valuemin="0" aria-valuemax="100" style="width: ' + percent + '%;min-width: 2em;">' + percent + '%</div>' +
+                '</div>';
+
+        layer.open({type: 1, title: '系统提示', content: content, area: ['600px', '460px'],
+            success: function () {
+                var schedule = setInterval(function () {
+                    cur++;
+                    $("#p_text1").html(cur);
+                    percent = parseInt(cur * 100 / i);
+                    $('.progress').html('<div class="progress-bar" role="progressbar progress-bar-striped active" aria-valuenow="' + percent + '" aria-valuemin="0" aria-valuemax="100" style="width: ' + percent + '%;min-width: 2em;">' + percent + '%</div>')
+                    if (cur >= i) {
+                        clearInterval(schedule);
+                        setTimeout(function () {
+                            if (d.stat == '1') {
+                                swal({
+                                    title: "太帅了",
+                                    text: d.msg,
+                                    type: "success"
+                                }, function () {
+                                    var url = "<{:url('Product/index')}>";
+                                    location.href = url;
+                                });
+                            } else {
+                                swal({
+                                    title: "出错了",
+                                    text: d.msg,
+                                    type: "error"
+                                });
+                            }
+                        }, 500)
+
+                    }
+                }, 500)
+            }});
+
+    }
+    $(function () {
+        $('#dg').bootstrapTable({
+            url: "<{:url('StartTask/listajax')}>",
+            //method:'post',
+            queryParams: function (params) {
+                params.p = parseInt(params.offset / params.limit) + 1;
+                params = $.extend(params, getQueryParams());
+                return params;
+            },
+            queryParamsType: "limit",
+            contentType: 'application/json',
+            dataType: 'json',
+            sidePagination: "server", //表示服务端请求
+            pagination: true, //启动分页
+            pageNumber: 1, //当前第几页
+            pageSize: 5, //每页显示的记录数
+            pageList: [10, 15, 20], //记录数可选列表
+            dataField: 'rows',
+            idField: "id",
+            columns: [{checkbox: true, align: 'center', valign: 'middle'},
+                {title: '任务名称', field: 'name', align: 'center', valign: 'middle'},
+                {title: '任务周期(秒)', field: 'frequent', align: 'center', valign: 'middle'},
+                {title: '任务状态', field: 'start', align: 'center', valign: 'middle'},
+                {title: '是否可更改', field: 're', align: 'center', valign: 'middle'},
+                {title: '操作', field: 'n_do', align: 'center', valign: 'middle',
+                    formatter: function (value, row, index) {
+                        var html = '';
+                        html = '<a href="' + channel_edit + '?id=' + row.id + '" class="btn btn-warning btn-sm" data-toggle="tooltip" data-placement="top" title="编辑" style=" margin-right:4px;"><span class="glyphicon glyphicon-edit"></span> 编辑</a>\n\
+';
+                        return html;
+                    }
+                }],
+            responseHandler: function (res) {
+                //远程数据加载之前,处理程序响应数据格式,对象包含的参数: 我们可以对返回的数据格式进行处理
+                //在ajax后我们可以在这里进行一些事件的处理
+                return res;
+            },
+            search: false,
+            iconSize: 'outline',
+            toolbar: '#exampleTableEventsToolbar',
+            icons: {
+                refresh: 'glyphicon-repeat',
+                toggle: 'glyphicon-list-alt',
+                columns: 'glyphicon-list'
+            },
+            toolbarAlign: 'left',
+            showToggle: false,
+            showColumns: false, //显示下拉框勾选要显示的列
+            // minimumCountColumns:3,
+            // showRefresh:true,//显示刷新按钮
+            striped: true, //表格显示条纹
+            singleSelect: false, //复选框只能选择一条记录  
+            clickToSelect: false, //点击行即可选中单选/复选框  
+            checkboxHeader: true
+        });
+        function alert_m(msg){
+                            swal("提示信息", msg, "success");   
+}
+   function update_post(url,data,msg){
+       $.post(url,data,function(data){
+           
+           if(data.stat==1){
+               msg();
+           }else{
+               alert(data.msg);
+           }
+       })
+   } 
+   function confirm_dialog(title,dec,action){
+ swal({
+        title: title,
+        text: dec,
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        cancelButtonText:"取消",
+        confirmButtonText: "确认",
+        closeOnConfirm: false
+    }, function (isConfirm) {
+        if(isConfirm){
+        action();    
+        }
+    });
+       
+   }
+   $("body").on("click",".upstatus",function(e){
+        e.preventDefault();
+        var status=$(this).attr("data-status");
+
+         var id=$(this).attr("data-id");
+       var data={id:id,status:status};
+       var url=update_url;
+         if(status==1){
+             var msg="确认启用当前业绩";
+         }else{
+             var msg="确认拒绝业绩";   
+         };
+confirm_dialog("确认提示",msg,function(){
+
+        if(id){
+            
+            update_post(url,data,function(){
+                        swal("操作成功！", msg, "success");   
+                        $("#dg").bootstrapTable("refresh");
+            });
+        }
+
+    
+});
+    })
+    });
+</script>
+<{include file="public/footer"}>

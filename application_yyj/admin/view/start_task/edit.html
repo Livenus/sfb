@@ -1,0 +1,130 @@
+<{include file="public/header" }>
+<link type="text/css" rel="stylesheet" href="/static/css/plugins/iCheck/custom.css">
+<script type="text/javascript" charset="utf-8" src="/static/js/plugins/iCheck/icheck.min.js"></script>
+<style>
+    body{
+        background: #f3f1f3;
+    }
+</style>
+<div class="wrapper wrapper-content animated fadeInRight" title="新增/修改文章" fit=true>
+    <div style="ibox">
+        <div class="ibox-title">
+            计划任务详情
+        </div>
+        <div class="ibox-content">
+            <form method="post" class="form-horizontal" id="form1">
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">任务名称</label>
+                    <div class="col-sm-10">
+                        <label class="control-label">会员返现任务</label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">任务周期(秒)</label>
+                    <div class="col-sm-10">
+                        <input type="text"  name="frequent" value="">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">是否开启任务</label>
+                    <div class="col-sm-10">
+                        <input type="radio"  name="start" value="0">关闭
+						  <input type="radio"  name="start" value="1">开启
+                    </div>
+                </div>
+                        <span class="help-block m-b-none"></span>
+                    </div>
+                </div>
+
+
+                <div class="hr-line-dashed"></div>
+                <div class="form-group">
+                    <div class="col-sm-4 col-sm-offset-2">
+                        <a class="btn btn-primary" type="bottun" id="submit">保存内容</a>
+                        <input class="btn btn-white" type="reset" value="取消"></input>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <link href="/static/css/plugins/summernote/summernote.css" rel="stylesheet">
+    <link href="/static/css/plugins/summernote/summernote-bs3.css" rel="stylesheet">
+    <!-- SUMMERNOTE -->
+    <script src="/static/js/plugins/summernote/summernote.min.js"></script>
+    <script src="/static/js/plugins/summernote/summernote-zh-CN.js"></script>
+
+    <script>
+
+                                        function edit() {
+                                            $("#eg").addClass("no-padding");
+                                            $('.click2edit').summernote({
+                                                lang: 'zh-CN',
+                                                focus: true
+                                            });
+                                        }
+                                        ;
+                                        $(document).ready(function () {
+
+                                            $('.summernote').summernote({
+                                                lang: 'zh-CN'
+                                            });
+
+                                        });
+
+                                        var save = function () {
+                                            $("#eg").removeClass("no-padding");
+                                            var aHTML = $('.click2edit').code(); //save HTML If you need(aHTML: array).
+                                            $('.click2edit').destroy();
+                                        };
+
+    </script>
+    <script>
+        var url = "<{:url('StartTask/save')}>";
+        //var edit_url = "<{:url('red/edit')}>";
+        $("#submit").click(function (e) {
+            var type;
+            type = $("#type").val();
+            if (type == 1) {
+                $("#code").val('1');
+            }
+            var content;
+            content = $("#content").html();
+            $("#content1").val(content);
+            var $form = $("#form1");
+            
+            $.ajax({
+                url: url,
+                data: $form.serialize(),
+                type: 'post',
+                dataType: 'json',
+                success: function (d) {
+                    if (d.stat == '1') {
+                        swal({
+                            title: "太帅了",
+                            text: d.msg ? d.msg : '操作成功！',
+                            type: "success"
+                        }, function () {
+                            location.href = "<{:url('StartTask/index')}>";
+                        });
+                    } else {
+                        swal({
+                            title: "出错了",
+                            text: d.msg ? d.msg : '操作失败',
+                            type: "error"
+                        });
+                    }
+                },
+                error: function (d) {
+                    swal({
+                        title: "出错了",
+                        text: d.msg ? d.msg : '操作失败',
+                        type: "error"
+                    });
+                }
+            });
+        });
+
+    </script>
+
+
+    <{include file="public/footer" }>
