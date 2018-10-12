@@ -26,7 +26,7 @@
                     </ul>
                     <div class="ibox-content">
                         <div class="">
-                            <form class="form-horizontal" id="form1" onclick="return false">
+                            <form method="post" class="form-horizontal" id="form1" onclick="return false">
                                 <div class="">
    
                                     <div class="form-group ">
@@ -91,6 +91,18 @@
                                             <input name="rate" type="number"  min="1" max="60"value="<{$rate['rate']}>" class="form-control"/>
                                             <span class="help-block m-b-none">%</span>
                                         </div>
+                                    </div>
+									<div class="form-group ">
+                                        <div class="col-sm-2 control-label">到账时间</div>
+                                        <div class="col-sm-4">
+											<select class="form-control" name="acc_date">
+											  <option  value ="1" <{if condition="$rate['acc_date']==1"}>selected<{/if}>>T+1</option>
+											  <option  value ="2" <{if condition="$rate['acc_date']==2"}>selected<{/if}>>T+2</option>
+											  <option  value="3" <{if condition="$rate['acc_date']==3"}>selected<{/if}>>T+3</option>
+											  <option value="4" <{if condition="$rate['acc_date']==4"}>selected<{/if}>>T+4</option>
+											</select>
+                                        </div>
+										
                                     </div>
                                     <div class="form-group ">
                                         <div class="col-sm-2 control-label">最低手续费</div>
